@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumoba - Вход</title>
+    <title>Lumoba</title>
     <style>
         * {
             margin: 0;
@@ -121,15 +121,15 @@
             color: #4ad88a;
             font-weight: 600;
         }
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
         #status {
             margin-top: 12px;
             font-size: 12px;
             text-align: center;
             opacity: 0.5;
+        }
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -138,217 +138,118 @@
         <h1>✦ LUMOBA</h1>
         <div class="subtitle">Вход в игру</div>
         <div id="authError" class="error"></div>
-        <input type="text" id="authLogin" placeholder="Логин" autocomplete="username">
-        <input type="password" id="authPass" placeholder="Пароль" autocomplete="current-password">
+        <input type="text" id="authLogin" placeholder="Логин">
+        <input type="password" id="authPass" placeholder="Пароль">
         <div class="btn-group">
             <button class="btn-primary" id="authBtn">Войти</button>
             <button class="btn-secondary" id="regBtn">Регистрация</button>
         </div>
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
-        <div id="status">Подключение к серверу...</div>
+        <div id="status">Подключение...</div>
     </div>
 
     <script>
         // ============================================================
-        //   НАСТРОЙКИ БАЗЫ ДАННЫХ
+        //   ПРОСТАЯ РАБОТА С TURSO
         // ============================================================
-        const DB_CONFIG = {
-            url: 'https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query',
-            token: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA'
-        };
+        const DB_URL = 'https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query';
+        const TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA';
 
-        // ============================================================
-        //   DOM ЭЛЕМЕНТЫ
-        // ============================================================
-        const authLogin = document.getElementById('authLogin');
-        const authPass = document.getElementById('authPass');
-        const authBtn = document.getElementById('authBtn');
-        const regBtn = document.getElementById('regBtn');
-        const switchMode = document.getElementById('switchMode');
-        const authError = document.getElementById('authError');
-        const success = document.getElementById('success');
-        const status = document.getElementById('status');
-
-        let isLoginMode = true;
-
-        // ============================================================
-        //   ФУНКЦИИ РАБОТЫ С БАЗОЙ
-        // ============================================================
-        async function queryDB(sql, params = []) {
-            try {
-                const response = await fetch(DB_CONFIG.url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${DB_CONFIG.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        statements: [{
-                            sql: sql,
-                            args: params
-                        }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Ошибка запроса:', error);
-                throw error;
-            }
+        async function sendSQL(sql) {
+            const response = await fetch(DB_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    statements: [{ sql: sql }]
+                })
+            });
+            return await response.json();
         }
 
         // ============================================================
-        //   СОЗДАНИЕ ТАБЛИЦ (если нет)
+        //   DOM
         // ============================================================
-        async function initDatabase() {
+        const login = document.getElementById('authLogin');
+        const pass = document.getElementById('authPass');
+        const authBtn = document.getElementById('authBtn');
+        const regBtn = document.getElementById('regBtn');
+        const switchMode = document.getElementById('switchMode');
+        const error = document.getElementById('authError');
+        const success = document.getElementById('success');
+        const status = document.getElementById('status');
+
+        let isLogin = true;
+
+        // ============================================================
+        //   СОЗДАНИЕ ТАБЛИЦЫ
+        // ============================================================
+        async function createTable() {
             try {
-                status.textContent = 'Создание таблиц...';
-                const sql = `
+                await sendSQL(`
                     CREATE TABLE IF NOT EXISTS users (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT UNIQUE NOT NULL,
-                        password TEXT NOT NULL,
+                        username TEXT UNIQUE,
+                        password TEXT,
                         rank TEXT DEFAULT 'Бронза',
-                        level INTEGER DEFAULT 1,
-                        exp INTEGER DEFAULT 0,
-                        gold INTEGER DEFAULT 500,
-                        kills INTEGER DEFAULT 0,
-                        deaths INTEGER DEFAULT 0,
-                        class TEXT DEFAULT 'fighter',
-                        clan TEXT DEFAULT 'Без клана',
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    );
-                `;
-                await queryDB(sql);
+                        level INTEGER DEFAULT 1
+                    )
+                `);
                 status.textContent = '✅ Готово';
                 return true;
-            } catch (error) {
-                status.textContent = '❌ Ошибка подключения';
-                authError.textContent = 'Не удалось подключиться к базе данных';
-                console.error(error);
+            } catch (e) {
+                status.textContent = '❌ Ошибка';
+                error.textContent = 'Не могу подключиться к БД';
                 return false;
             }
         }
 
         // ============================================================
-        //   ХЕШИРОВАНИЕ ПАРОЛЯ (простое для демо)
+        //   ВХОД
         // ============================================================
-        function hashPassword(password) {
-            let hash = 0;
-            for (let i = 0; i < password.length; i++) {
-                const char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return 'hash_' + Math.abs(hash).toString(36);
-        }
+        async function loginUser() {
+            const username = login.value.trim();
+            const password = pass.value.trim();
 
-        // ============================================================
-        //   АВТОРИЗАЦИЯ
-        // ============================================================
-        async function handleAuth() {
-            const login = authLogin.value.trim();
-            const password = authPass.value.trim();
-
-            if (!login || !password) {
-                authError.textContent = 'Заполните все поля';
+            if (!username || !password) {
+                error.textContent = 'Заполните все поля';
                 return;
             }
 
-            authError.textContent = '';
+            error.textContent = '';
             success.style.display = 'none';
 
-            // Блокируем кнопки
             authBtn.classList.add('loading');
             regBtn.classList.add('loading');
 
             try {
-                // Инициализируем БД
-                await initDatabase();
+                await createTable();
 
-                const hashedPass = hashPassword(password);
+                const result = await sendSQL(`
+                    SELECT * FROM users 
+                    WHERE username = '${username}' 
+                    AND password = '${password}'
+                `);
 
-                if (isLoginMode) {
-                    // ВХОД
-                    status.textContent = 'Проверка данных...';
-                    const result = await queryDB(
-                        'SELECT * FROM users WHERE username = ? AND password = ?',
-                        [login, hashedPass]
-                    );
+                const rows = result.results?.[0]?.response?.result?.rows || [];
 
-                    if (!result.results || !result.results[0] || !result.results[0].response) {
-                        throw new Error('Некорректный ответ от сервера');
-                    }
-
-                    const rows = result.results[0].response.result.rows || [];
-
-                    if (rows.length === 0) {
-                        authError.textContent = '❌ Неверный логин или пароль';
-                        status.textContent = 'Ошибка входа';
-                        return;
-                    }
-
-                    const user = rows[0];
-                    success.style.display = 'block';
-                    success.textContent = `✅ Добро пожаловать, ${user.username}!`;
-                    status.textContent = `👋 Привет, ${user.username} (Уровень ${user.level})`;
-                    authError.textContent = '';
-
-                    // Показываем данные пользователя
-                    console.log('Пользователь найден:', user);
-
-                } else {
-                    // РЕГИСТРАЦИЯ
-                    status.textContent = 'Проверка логина...';
-
-                    // Проверяем, существует ли пользователь
-                    const checkResult = await queryDB(
-                        'SELECT id FROM users WHERE username = ?',
-                        [login]
-                    );
-
-                    const existingRows = checkResult.results?.[0]?.response?.result?.rows || [];
-
-                    if (existingRows.length > 0) {
-                        authError.textContent = '❌ Пользователь уже существует';
-                        status.textContent = 'Ошибка регистрации';
-                        return;
-                    }
-
-                    status.textContent = 'Создание аккаунта...';
-
-                    // Создаём пользователя
-                    await queryDB(
-                        `INSERT INTO users (username, password, rank, level, exp, gold, class, clan) 
-                         VALUES (?, ?, 'Бронза', 1, 0, 500, 'fighter', 'Без клана')`,
-                        [login, hashedPass]
-                    );
-
-                    success.style.display = 'block';
-                    success.textContent = '✅ Аккаунт создан! Теперь войдите.';
-                    status.textContent = '✅ Регистрация успешна!';
-
-                    // Переключаем на вход
-                    isLoginMode = true;
-                    authBtn.textContent = 'Войти';
-                    regBtn.textContent = 'Регистрация';
-                    switchMode.textContent = 'Нет аккаунта? Зарегистрируйтесь';
-
-                    authLogin.value = '';
-                    authPass.value = '';
+                if (rows.length === 0) {
+                    error.textContent = '❌ Неверный логин или пароль';
+                    return;
                 }
 
-            } catch (error) {
-                console.error('Ошибка:', error);
-                authError.textContent = `❌ Ошибка: ${error.message || 'Неизвестная ошибка'}`;
-                status.textContent = '❌ Ошибка';
+                const user = rows[0];
+                success.style.display = 'block';
+                success.textContent = `✅ Привет, ${user.username}! (Уровень ${user.level})`;
+                status.textContent = `👋 ${user.username}`;
+                error.textContent = '';
+
+            } catch (e) {
+                error.textContent = '❌ Ошибка сервера';
+                console.error(e);
             } finally {
                 authBtn.classList.remove('loading');
                 regBtn.classList.remove('loading');
@@ -356,51 +257,100 @@
         }
 
         // ============================================================
-        //   ОБРАБОТЧИКИ СОБЫТИЙ
+        //   РЕГИСТРАЦИЯ
         // ============================================================
-        authBtn.addEventListener('click', handleAuth);
+        async function registerUser() {
+            const username = login.value.trim();
+            const password = pass.value.trim();
+
+            if (!username || !password) {
+                error.textContent = 'Заполните все поля';
+                return;
+            }
+
+            error.textContent = '';
+            success.style.display = 'none';
+
+            authBtn.classList.add('loading');
+            regBtn.classList.add('loading');
+
+            try {
+                await createTable();
+
+                // Проверка существования
+                const check = await sendSQL(`
+                    SELECT id FROM users WHERE username = '${username}'
+                `);
+
+                const exists = check.results?.[0]?.response?.result?.rows || [];
+
+                if (exists.length > 0) {
+                    error.textContent = '❌ Пользователь уже существует';
+                    return;
+                }
+
+                // Создание
+                await sendSQL(`
+                    INSERT INTO users (username, password) 
+                    VALUES ('${username}', '${password}')
+                `);
+
+                success.style.display = 'block';
+                success.textContent = '✅ Аккаунт создан! Теперь войдите.';
+                status.textContent = '✅ Регистрация успешна!';
+
+                // Очищаем поля
+                login.value = '';
+                pass.value = '';
+
+            } catch (e) {
+                error.textContent = '❌ Ошибка сервера';
+                console.error(e);
+            } finally {
+                authBtn.classList.remove('loading');
+                regBtn.classList.remove('loading');
+            }
+        }
+
+        // ============================================================
+        //   СОБЫТИЯ
+        // ============================================================
+        authBtn.addEventListener('click', () => {
+            if (isLogin) {
+                loginUser();
+            } else {
+                registerUser();
+            }
+        });
 
         regBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
-            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
-            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
-            authError.textContent = '';
+            isLogin = !isLogin;
+            authBtn.textContent = isLogin ? 'Войти' : 'Создать';
+            regBtn.textContent = isLogin ? 'Регистрация' : 'Войти';
+            switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
+            error.textContent = '';
             success.style.display = 'none';
         });
 
         switchMode.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
-            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
-            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
-            authError.textContent = '';
+            isLogin = !isLogin;
+            authBtn.textContent = isLogin ? 'Войти' : 'Создать';
+            regBtn.textContent = isLogin ? 'Регистрация' : 'Войти';
+            switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
+            error.textContent = '';
             success.style.display = 'none';
         });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                handleAuth();
+                authBtn.click();
             }
         });
 
         // ============================================================
-        //   ПРОВЕРКА ПОДКЛЮЧЕНИЯ ПРИ ЗАГРУЗКЕ
+        //   ЗАПУСК
         // ============================================================
-        async function checkConnection() {
-            try {
-                status.textContent = 'Проверка подключения...';
-                await queryDB('SELECT 1');
-                status.textContent = '✅ Подключено к серверу';
-            } catch (error) {
-                status.textContent = '❌ Нет подключения к серверу';
-                authError.textContent = 'Не удалось подключиться к базе данных. Проверьте интернет.';
-                console.error(error);
-            }
-        }
-
-        // Запускаем проверку
-        checkConnection();
+        createTable();
     </script>
 </body>
 </html>
