@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumoba - 2D MOBA</title>
+    <title>Lumoba - Вход</title>
     <style>
         * {
             margin: 0;
@@ -12,32 +12,20 @@
         }
         body {
             background: #0a0a12;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
             color: #e0e0f0;
         }
-        #authScreen {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, #14142a, #08080e);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-        }
         #authBox {
-            background: rgba(18, 18, 35, 0.92);
+            background: rgba(18, 18, 35, 0.95);
             border: 1px solid rgba(100, 80, 255, 0.2);
             border-radius: 24px;
             padding: 48px 40px;
             width: 400px;
             box-shadow: 0 0 80px rgba(80, 60, 200, 0.15);
-            backdrop-filter: blur(12px);
         }
         #authBox h1 {
             text-align: center;
@@ -47,14 +35,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
-            letter-spacing: 2px;
         }
         #authBox .subtitle {
             text-align: center;
             opacity: 0.5;
             font-size: 13px;
             margin-bottom: 32px;
-            letter-spacing: 3px;
         }
         #authBox input {
             width: 100%;
@@ -65,13 +51,12 @@
             border-radius: 12px;
             color: #f0f0ff;
             font-size: 14px;
-            transition: all 0.3s;
             outline: none;
+            transition: 0.3s;
         }
         #authBox input:focus {
             border-color: rgba(100, 80, 255, 0.4);
             background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 20px rgba(80, 60, 200, 0.1);
         }
         #authBox input::placeholder {
             color: rgba(255, 255, 255, 0.25);
@@ -90,7 +75,6 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            letter-spacing: 0.5px;
         }
         #authBox .btn-primary {
             background: linear-gradient(135deg, #6b5bff, #4a4aff);
@@ -99,7 +83,6 @@
         }
         #authBox .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 30px rgba(80, 60, 255, 0.4);
         }
         #authBox .btn-secondary {
             background: rgba(255, 255, 255, 0.06);
@@ -127,321 +110,264 @@
         #authBox .switch-mode:hover {
             opacity: 0.8;
         }
-
-        #gameContainer {
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 0 60px rgba(60, 40, 200, 0.1);
-        }
-        canvas {
-            display: block;
-            background: #0d0d18;
-            cursor: crosshair;
-        }
-
-        #ui {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            pointer-events: none;
-        }
-        #skills {
-            display: flex;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        .skill-btn {
-            width: 58px;
-            height: 58px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(12, 12, 28, 0.85);
-            backdrop-filter: blur(12px);
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            text-shadow: 0 0 15px rgba(100, 80, 255, 0.3);
-        }
-        .skill-btn:hover {
-            transform: scale(1.06);
-            border-color: rgba(130, 100, 255, 0.3);
-        }
-        .skill-btn .key-hint {
-            position: absolute;
-            bottom: 4px;
-            right: 6px;
-            font-size: 9px;
-            opacity: 0.3;
-        }
-        .skill-btn .cd-overlay {
-            position: absolute;
-            inset: 0;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-            color: #ff4477;
-            backdrop-filter: blur(4px);
+        #success {
             display: none;
-        }
-        #stats {
-            pointer-events: auto;
-            background: rgba(8, 8, 20, 0.85);
-            backdrop-filter: blur(14px);
-            padding: 12px 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            min-width: 220px;
-            font-size: 12px;
-        }
-        #stats .row {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 2px 0;
-        }
-        #stats .label {
-            opacity: 0.4;
-            font-weight: 400;
-        }
-        #stats .value {
-            font-weight: 600;
-            color: #f0f0ff;
-        }
-        .hp-wrap {
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            margin: 4px 0 6px 0;
-            overflow: hidden;
-        }
-        .hp-wrap .fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s;
-            background: linear-gradient(90deg, #ff3366, #ff6688);
-        }
-        #minimap {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 170px;
-            height: 130px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(74, 216, 138, 0.1);
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            background: rgba(4, 4, 14, 0.7);
-            backdrop-filter: blur(6px);
-            pointer-events: auto;
-            overflow: hidden;
-        }
-        #minimap canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-        }
-        #gameInfo {
-            position: absolute;
-            top: 16px;
-            left: 20px;
-            display: flex;
-            gap: 20px;
-            font-size: 12px;
-            opacity: 0.5;
-            pointer-events: none;
-            letter-spacing: 0.5px;
-        }
-        #gameInfo .clan {
-            color: #6b8aff;
-        }
-        .class-badge {
-            display: inline-block;
-            padding: 1px 12px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-        .class-badge.fighter {
-            background: rgba(255, 100, 80, 0.2);
-            color: #ff6b4a;
-        }
-        .class-badge.assassin {
-            background: rgba(255, 50, 120, 0.2);
-            color: #ff3377;
-        }
-        .class-badge.mage {
-            background: rgba(80, 100, 255, 0.2);
-            color: #6b8aff;
-        }
-        .class-badge.tank {
-            background: rgba(80, 200, 120, 0.2);
+            border: 1px solid rgba(74, 216, 138, 0.2);
+            margin-top: 16px;
             color: #4ad88a;
+            font-weight: 600;
         }
-        .class-badge.support {
-            background: rgba(255, 200, 60, 0.2);
-            color: #ffc84a;
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
-        .rank-icon {
-            font-size: 14px;
-            margin-right: 4px;
+        #status {
+            margin-top: 12px;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
-
-    <!-- АВТОРИЗАЦИЯ -->
-    <div id="authScreen">
-        <div id="authBox">
-            <h1>✦ LUMOBA</h1>
-            <div class="subtitle">МОБА · 2D · ЭПИЧНО</div>
-            <div id="authError" class="error"></div>
-            <input type="text" id="authLogin" placeholder="Логин" autocomplete="username">
-            <input type="password" id="authPass" placeholder="Пароль" autocomplete="current-password">
-            <div class="btn-group">
-                <button class="btn-primary" id="authBtn">Войти</button>
-                <button class="btn-secondary" id="regBtn">Регистрация</button>
-            </div>
-            <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
+    <div id="authBox">
+        <h1>✦ LUMOBA</h1>
+        <div class="subtitle">Вход в игру</div>
+        <div id="authError" class="error"></div>
+        <input type="text" id="authLogin" placeholder="Логин" autocomplete="username">
+        <input type="password" id="authPass" placeholder="Пароль" autocomplete="current-password">
+        <div class="btn-group">
+            <button class="btn-primary" id="authBtn">Войти</button>
+            <button class="btn-secondary" id="regBtn">Регистрация</button>
         </div>
-    </div>
-
-    <!-- ИГРА -->
-    <div id="gameContainer" style="display:none;">
-        <canvas id="gameCanvas" width="1500" height="920"></canvas>
-        <div id="minimap"><canvas id="minimapCanvas" width="170" height="130"></canvas></div>
-        <div id="gameInfo">
-            <span id="playerName">Игрок</span>
-            <span class="clan" id="clanName">⚔️ Клан</span>
-            <span id="classDisplay"><span class="class-badge fighter">Боец</span></span>
-            <span id="rankDisplay"><span class="rank-icon">⭐</span> Бронза</span>
-        </div>
-        <div id="ui">
-            <div id="skills">
-                <div class="skill-btn" data-key="81">Q<span class="key-hint">Q</span><div class="cd-overlay"></div></div>
-                <div class="skill-btn" data-key="87">W<span class="key-hint">W</span><div class="cd-overlay"></div></div>
-                <div class="skill-btn" data-key="69">E<span class="key-hint">E</span><div class="cd-overlay"></div></div>
-                <div class="skill-btn" data-key="82">R<span class="key-hint">R</span><div class="cd-overlay"></div></div>
-            </div>
-            <div id="stats">
-                <div class="row"><span class="label">❤️ HP</span><span class="value" id="hpText">100/100</span></div>
-                <div class="hp-wrap"><div class="fill" id="hpFill" style="width:100%"></div></div>
-                <div class="row">
-                    <span class="label">⚔️ Ур.</span><span class="value" id="levelText">1</span>
-                    <span class="label">💀 K</span><span class="value" id="killsText">0</span>
-                    <span class="label">🪦 D</span><span class="value" id="deathsText">0</span>
-                </div>
-                <div class="row">
-                    <span class="label">🪙 Золото</span><span class="value" id="goldText" style="color:#ffd866;">500</span>
-                    <span class="label">✨ Опыт</span><span class="value" id="expText">0/100</span>
-                </div>
-            </div>
-        </div>
+        <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
+        <div id="success">✅ Успешно!</div>
+        <div id="status">Подключение к серверу...</div>
     </div>
 
     <script>
-        // =============================================================
-        //   💾 МОДУЛЬ БАЗЫ ДАННЫХ (Turso / libSQL)
-        // =============================================================
+        // ============================================================
+        //   НАСТРОЙКИ БАЗЫ ДАННЫХ
+        // ============================================================
         const DB_CONFIG = {
-            url: 'libsql://lumoba-cursedd.aws-eu-west-1.turso.io',
+            url: 'https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query',
             token: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA'
         };
 
-        let db = null;
-        let currentUser = null;
-
-        // Инициализация через HTTP API Turso
-        async function tursoQuery(sql, args = []) {
-            const resp = await fetch(`${DB_CONFIG.url}/v1/query`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${DB_CONFIG.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    statements: [{ sql, args }]
-                })
-            });
-            const data = await resp.json();
-            if (data.error) throw new Error(data.error.message);
-            return data.results?.[0]?.response?.result?.rows || [];
-        }
-
-        // SQL-схема (выполнить один раз)
-        const SQL_SCHEMA = `
-        -- Таблица пользователей
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            rank TEXT DEFAULT 'Бронза',
-            level INTEGER DEFAULT 1,
-            exp INTEGER DEFAULT 0,
-            gold INTEGER DEFAULT 500,
-            kills INTEGER DEFAULT 0,
-            deaths INTEGER DEFAULT 0,
-            class TEXT DEFAULT 'fighter',
-            clan TEXT DEFAULT 'Без клана',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-
-        -- Таблица матчей (история)
-        CREATE TABLE IF NOT EXISTS matches (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            hero_class TEXT,
-            kills INTEGER,
-            deaths INTEGER,
-            gold_earned INTEGER,
-            result TEXT,
-            played_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        );
-
-        -- Таблица кланов
-        CREATE TABLE IF NOT EXISTS clans (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL,
-            leader_id INTEGER,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (leader_id) REFERENCES users(id)
-        );
-
-        -- Индексы для скорости
-        CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-        CREATE INDEX IF NOT EXISTS idx_matches_user ON matches(user_id);
-        `;
-
-        // =============================================================
-        //   🔐 СИСТЕМА АВТОРИЗАЦИИ
-        // =============================================================
-        const authScreen = document.getElementById('authScreen');
-        const authBox = document.getElementById('authBox');
+        // ============================================================
+        //   DOM ЭЛЕМЕНТЫ
+        // ============================================================
         const authLogin = document.getElementById('authLogin');
         const authPass = document.getElementById('authPass');
         const authBtn = document.getElementById('authBtn');
         const regBtn = document.getElementById('regBtn');
         const switchMode = document.getElementById('switchMode');
         const authError = document.getElementById('authError');
+        const success = document.getElementById('success');
+        const status = document.getElementById('status');
 
         let isLoginMode = true;
+
+        // ============================================================
+        //   ФУНКЦИИ РАБОТЫ С БАЗОЙ
+        // ============================================================
+        async function queryDB(sql, params = []) {
+            try {
+                const response = await fetch(DB_CONFIG.url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DB_CONFIG.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        statements: [{
+                            sql: sql,
+                            args: params
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Ошибка запроса:', error);
+                throw error;
+            }
+        }
+
+        // ============================================================
+        //   СОЗДАНИЕ ТАБЛИЦ (если нет)
+        // ============================================================
+        async function initDatabase() {
+            try {
+                status.textContent = 'Создание таблиц...';
+                const sql = `
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT UNIQUE NOT NULL,
+                        password TEXT NOT NULL,
+                        rank TEXT DEFAULT 'Бронза',
+                        level INTEGER DEFAULT 1,
+                        exp INTEGER DEFAULT 0,
+                        gold INTEGER DEFAULT 500,
+                        kills INTEGER DEFAULT 0,
+                        deaths INTEGER DEFAULT 0,
+                        class TEXT DEFAULT 'fighter',
+                        clan TEXT DEFAULT 'Без клана',
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    );
+                `;
+                await queryDB(sql);
+                status.textContent = '✅ Готово';
+                return true;
+            } catch (error) {
+                status.textContent = '❌ Ошибка подключения';
+                authError.textContent = 'Не удалось подключиться к базе данных';
+                console.error(error);
+                return false;
+            }
+        }
+
+        // ============================================================
+        //   ХЕШИРОВАНИЕ ПАРОЛЯ (простое для демо)
+        // ============================================================
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return 'hash_' + Math.abs(hash).toString(36);
+        }
+
+        // ============================================================
+        //   АВТОРИЗАЦИЯ
+        // ============================================================
+        async function handleAuth() {
+            const login = authLogin.value.trim();
+            const password = authPass.value.trim();
+
+            if (!login || !password) {
+                authError.textContent = 'Заполните все поля';
+                return;
+            }
+
+            authError.textContent = '';
+            success.style.display = 'none';
+
+            // Блокируем кнопки
+            authBtn.classList.add('loading');
+            regBtn.classList.add('loading');
+
+            try {
+                // Инициализируем БД
+                await initDatabase();
+
+                const hashedPass = hashPassword(password);
+
+                if (isLoginMode) {
+                    // ВХОД
+                    status.textContent = 'Проверка данных...';
+                    const result = await queryDB(
+                        'SELECT * FROM users WHERE username = ? AND password = ?',
+                        [login, hashedPass]
+                    );
+
+                    if (!result.results || !result.results[0] || !result.results[0].response) {
+                        throw new Error('Некорректный ответ от сервера');
+                    }
+
+                    const rows = result.results[0].response.result.rows || [];
+
+                    if (rows.length === 0) {
+                        authError.textContent = '❌ Неверный логин или пароль';
+                        status.textContent = 'Ошибка входа';
+                        return;
+                    }
+
+                    const user = rows[0];
+                    success.style.display = 'block';
+                    success.textContent = `✅ Добро пожаловать, ${user.username}!`;
+                    status.textContent = `👋 Привет, ${user.username} (Уровень ${user.level})`;
+                    authError.textContent = '';
+
+                    // Показываем данные пользователя
+                    console.log('Пользователь найден:', user);
+
+                } else {
+                    // РЕГИСТРАЦИЯ
+                    status.textContent = 'Проверка логина...';
+
+                    // Проверяем, существует ли пользователь
+                    const checkResult = await queryDB(
+                        'SELECT id FROM users WHERE username = ?',
+                        [login]
+                    );
+
+                    const existingRows = checkResult.results?.[0]?.response?.result?.rows || [];
+
+                    if (existingRows.length > 0) {
+                        authError.textContent = '❌ Пользователь уже существует';
+                        status.textContent = 'Ошибка регистрации';
+                        return;
+                    }
+
+                    status.textContent = 'Создание аккаунта...';
+
+                    // Создаём пользователя
+                    await queryDB(
+                        `INSERT INTO users (username, password, rank, level, exp, gold, class, clan) 
+                         VALUES (?, ?, 'Бронза', 1, 0, 500, 'fighter', 'Без клана')`,
+                        [login, hashedPass]
+                    );
+
+                    success.style.display = 'block';
+                    success.textContent = '✅ Аккаунт создан! Теперь войдите.';
+                    status.textContent = '✅ Регистрация успешна!';
+
+                    // Переключаем на вход
+                    isLoginMode = true;
+                    authBtn.textContent = 'Войти';
+                    regBtn.textContent = 'Регистрация';
+                    switchMode.textContent = 'Нет аккаунта? Зарегистрируйтесь';
+
+                    authLogin.value = '';
+                    authPass.value = '';
+                }
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                authError.textContent = `❌ Ошибка: ${error.message || 'Неизвестная ошибка'}`;
+                status.textContent = '❌ Ошибка';
+            } finally {
+                authBtn.classList.remove('loading');
+                regBtn.classList.remove('loading');
+            }
+        }
+
+        // ============================================================
+        //   ОБРАБОТЧИКИ СОБЫТИЙ
+        // ============================================================
+        authBtn.addEventListener('click', handleAuth);
+
+        regBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
+            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
+            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
+            authError.textContent = '';
+            success.style.display = 'none';
+        });
 
         switchMode.addEventListener('click', () => {
             isLoginMode = !isLoginMode;
@@ -449,1123 +375,32 @@
             regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
             switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
             authError.textContent = '';
+            success.style.display = 'none';
         });
 
-        function hashPassword(pw) {
-            // Простой хеш для демо (в реальности используйте bcrypt на сервере)
-            let hash = 0;
-            for (let i = 0; i < pw.length; i++) {
-                const char = pw.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash |= 0;
-            }
-            return 'hash_' + Math.abs(hash).toString(36);
-        }
-
-        async function handleAuth() {
-            const login = authLogin.value.trim();
-            const pass = authPass.value.trim();
-            if (!login || !pass) {
-                authError.textContent = 'Заполните все поля';
-                return;
-            }
-
-            try {
-                await tursoQuery(SQL_SCHEMA); // убедимся, что таблицы есть
-
-                if (isLoginMode) {
-                    // Вход
-                    const rows = await tursoQuery(
-                        'SELECT * FROM users WHERE username = ? AND password = ?', [login, hashPassword(pass)]
-                    );
-                    if (rows.length === 0) {
-                        authError.textContent = 'Неверный логин или пароль';
-                        return;
-                    }
-                    const user = rows[0];
-                    currentUser = {
-                        id: user.id,
-                        username: user.username,
-                        rank: user.rank,
-                        level: user.level,
-                        exp: user.exp,
-                        gold: user.gold,
-                        kills: user.kills,
-                        deaths: user.deaths,
-                        class: user.class,
-                        clan: user.clan || 'Без клана'
-                    };
-                    authError.textContent = '';
-                    authScreen.style.display = 'none';
-                    document.getElementById('gameContainer').style.display = 'block';
-                    startGame(currentUser);
-                } else {
-                    // Регистрация
-                    const exists = await tursoQuery('SELECT id FROM users WHERE username = ?', [login]);
-                    if (exists.length > 0) {
-                        authError.textContent = 'Пользователь уже существует';
-                        return;
-                    }
-                    await tursoQuery(
-                        'INSERT INTO users (username, password, rank, level, exp, gold, class, clan) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
-                            login, hashPassword(pass), 'Бронза', 1, 0, 500, 'fighter', 'Без клана'
-                        ]
-                    );
-                    authError.textContent = '✅ Регистрация успешна! Войдите.';
-                    isLoginMode = true;
-                    authBtn.textContent = 'Войти';
-                    regBtn.textContent = 'Регистрация';
-                    switchMode.textContent = 'Нет аккаунта? Зарегистрируйтесь';
-                    authLogin.value = '';
-                    authPass.value = '';
-                }
-            } catch (e) {
-                authError.textContent = 'Ошибка: ' + e.message;
-            }
-        }
-
-        authBtn.addEventListener('click', handleAuth);
-        regBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
-            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
-            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
-            authError.textContent = '';
-        });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAuth(); });
-
-        // =============================================================
-        //   🎮 ИГРОВОЙ ДВИЖОК
-        // =============================================================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const miniCanvas = document.getElementById('minimapCanvas');
-        const miniCtx = miniCanvas.getContext('2d');
-
-        const W = 1500,
-            H = 920;
-
-        // Классы героев
-        const CLASSES = {
-            fighter: { name: 'Боец', hp: 120, speed: 2.8, dmg: 20, range: 60, color: '#ff6b4a', icon: '⚔️' },
-            assassin: { name: 'Убийца', hp: 80, speed: 3.5, dmg: 35, range: 50, color: '#ff3377', icon: '🗡️' },
-            mage: { name: 'Маг', hp: 70, speed: 2.4, dmg: 45, range: 130, color: '#6b8aff', icon: '🔮' },
-            tank: { name: 'Танк', hp: 180, speed: 2.2, dmg: 12, range: 55, color: '#4ad88a', icon: '🛡️' },
-            support: { name: 'Поддержка', hp: 90, speed: 2.6, dmg: 10, range: 90, color: '#ffc84a', icon: '💛' }
-        };
-
-        // Ранги
-        const RANKS = ['Бронза', 'Серебро', 'Золото', 'Платина', 'Алмаз', 'Мифический', 'Легенда'];
-        const RANK_COLORS = ['#cd7f32', '#c0c0c0', '#ffd700', '#e5e4e2', '#b9f2ff', '#ff6bff', '#ff3366'];
-
-        // Состояние игры
-        let game = {
-            heroes: [],
-            towers: [],
-            minions: [],
-            projectiles: [],
-            particles: [],
-            gold: 0,
-            exp: 0,
-            level: 1,
-            kills: 0,
-            deaths: 0,
-            player: null,
-            enemyTeam: [],
-            allyTeam: [],
-            time: 0,
-            paused: false
-        };
-
-        // Карта
-        const MAP = {
-            lanes: {
-                top: { y: 140, xStart: 200, xEnd: 1300 },
-                mid: { y: 460, xStart: 200, xEnd: 1300 },
-                bot: { y: 780, xStart: 200, xEnd: 1300 }
-            },
-            jungle: [
-                { x: 350, y: 280, type: 'camp' },
-                { x: 1150, y: 280, type: 'camp' },
-                { x: 350, y: 640, type: 'camp' },
-                { x: 1150, y: 640, type: 'camp' },
-                { x: 750, y: 460, type: 'buff' }
-            ],
-            bushes: [
-                { x: 300, y: 200, w: 80, h: 60 },
-                { x: 1120, y: 200, w: 80, h: 60 },
-                { x: 300, y: 660, w: 80, h: 60 },
-                { x: 1120, y: 660, w: 80, h: 60 },
-                { x: 700, y: 400, w: 100, h: 80 }
-            ]
-        };
-
-        // Создание башен
-        function createTowers() {
-            const towers = [];
-            // Команда 1 (синие) - левая сторона
-            const team1 = [
-                { x: 180, y: 120 }, { x: 180, y: 440 }, { x: 180, y: 760 },
-                { x: 400, y: 120 }, { x: 400, y: 440 }, { x: 400, y: 760 },
-                { x: 600, y: 440 }
-            ];
-            // Команда 2 (красные) - правая сторона
-            const team2 = [
-                { x: 1320, y: 120 }, { x: 1320, y: 440 }, { x: 1320, y: 760 },
-                { x: 1100, y: 120 }, { x: 1100, y: 440 }, { x: 1100, y: 760 },
-                { x: 900, y: 440 }
-            ];
-            team1.forEach(p => {
-                towers.push({ x: p.x, y: p.y, team: 1, hp: 200, maxHp: 200, radius: 30, attackRange: 150, attackCooldown: 0,
-                    damage: 15 });
-            });
-            team2.forEach(p => {
-                towers.push({ x: p.x, y: p.y, team: 2, hp: 200, maxHp: 200, radius: 30, attackRange: 150, attackCooldown: 0,
-                    damage: 15 });
-            });
-            return towers;
-        }
-
-        // Создание героя
-        function createHero(x, y, classType, team, name = 'Hero') {
-            const cls = CLASSES[classType];
-            return {
-                id: Date.now() + Math.random() * 1000,
-                x,
-                y,
-                team,
-                name,
-                classType,
-                hp: cls.hp,
-                maxHp: cls.hp,
-                speed: cls.speed,
-                damage: cls.dmg,
-                range: cls.range,
-                radius: 22,
-                color: cls.color,
-                icon: cls.icon,
-                attackCooldown: 0,
-                attackSpeed: 40,
-                level: 1,
-                exp: 0,
-                gold: 0,
-                kills: 0,
-                deaths: 0,
-                isPlayer: false,
-                target: null,
-                path: [],
-                moving: false,
-                targetX: x,
-                targetY: y,
-                skills: {
-                    q: { cooldown: 0, maxCooldown: 60, damage: 1.8, type: 'damage' },
-                    w: { cooldown: 0, maxCooldown: 80, damage: 0.5, type: 'heal' },
-                    e: { cooldown: 0, maxCooldown: 100, damage: 2.5, type: 'damage' },
-                    r: { cooldown: 0, maxCooldown: 150, damage: 4.0, type: 'damage' }
-                },
-                aiTimer: 0,
-                aiState: 'idle'
-            };
-        }
-
-        // =============================================================
-        //   🧠 ИИ БОТОВ
-        // =============================================================
-        function updateBot(hero) {
-            if (hero.isPlayer) return;
-
-            hero.aiTimer--;
-            if (hero.aiTimer > 0) return;
-            hero.aiTimer = 30 + Math.random() * 60;
-
-            // Поиск ближайшего врага
-            let nearest = null;
-            let nearDist = Infinity;
-            const all = [...game.heroes, ...game.minions];
-            for (const other of all) {
-                if (other.team === hero.team) continue;
-                const dx = other.x - hero.x;
-                const dy = other.y - hero.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < nearDist && dist < 500) {
-                    nearDist = dist;
-                    nearest = other;
-                }
-            }
-
-            if (nearest && nearDist < 300) {
-                hero.target = nearest;
-                hero.aiState = 'attack';
-                // Движение к цели
-                const dx = nearest.x - hero.x;
-                const dy = nearest.y - hero.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > hero.range) {
-                    hero.x += (dx / dist) * hero.speed;
-                    hero.y += (dy / dist) * hero.speed;
-                }
-            } else {
-                hero.aiState = 'idle';
-                // Случайное блуждание к линиям
-                if (Math.random() < 0.02) {
-                    const lane = ['top', 'mid', 'bot'][Math.floor(Math.random() * 3)];
-                    hero.targetX = 200 + Math.random() * 1100;
-                    hero.targetY = MAP.lanes[lane].y + (Math.random() - 0.5) * 80;
-                    hero.moving = true;
-                }
-                if (hero.moving) {
-                    const dx = hero.targetX - hero.x;
-                    const dy = hero.targetY - hero.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist > 5) {
-                        hero.x += (dx / dist) * hero.speed * 0.6;
-                        hero.y += (dy / dist) * hero.speed * 0.6;
-                    } else {
-                        hero.moving = false;
-                    }
-                }
-            }
-
-            // Атака
-            if (hero.target) {
-                const dx = hero.target.x - hero.x;
-                const dy = hero.target.y - hero.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < hero.range + hero.target.radius) {
-                    attackTarget(hero, hero.target);
-                }
-            }
-        }
-
-        // =============================================================
-        //   ⚔️ БОЕВАЯ СИСТЕМА
-        // =============================================================
-        function attackTarget(attacker, target) {
-            if (attacker.attackCooldown > 0) return;
-            attacker.attackCooldown = attacker.attackSpeed;
-
-            const dmg = attacker.damage * (0.8 + Math.random() * 0.4);
-            target.hp -= dmg;
-            spawnParticles(target.x, target.y, '#ff4477', 10);
-
-            if (target.hp <= 0) {
-                target.hp = 0;
-                if (target.isPlayer) {
-                    game.deaths++;
-                    updateUserStats();
-                } else {
-                    attacker.kills++;
-                    attacker.gold += 50 + Math.floor(Math.random() * 30);
-                    attacker.exp += 20 + Math.floor(Math.random() * 20);
-                    if (attacker.isPlayer) {
-                        game.kills++;
-                        game.gold += 50 + Math.floor(Math.random() * 30);
-                        game.exp += 20 + Math.floor(Math.random() * 20);
-                        updateUserStats();
-                        checkLevelUp();
-                    }
-                }
-                // Респавн через 5 секунд
-                setTimeout(() => {
-                    const spawn = getSpawnPoint(target.team);
-                    target.x = spawn.x;
-                    target.y = spawn.y;
-                    target.hp = target.maxHp;
-                }, 5000);
-            }
-        }
-
-        function getSpawnPoint(team) {
-            if (team === 1) return { x: 80, y: 460 };
-            return { x: 1420, y: 460 };
-        }
-
-        // =============================================================
-        //   ✨ ЧАСТИЦЫ И ЭФФЕКТЫ
-        // =============================================================
-        function spawnParticles(x, y, color, count = 15) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 1 + Math.random() * 4;
-                game.particles.push({
-                    x,
-                    y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed - 1,
-                    life: 30 + Math.random() * 30,
-                    maxLife: 60,
-                    color,
-                    size: 3 + Math.random() * 6,
-                    gravity: 0.05
-                });
-            }
-        }
-
-        function updateParticles() {
-            for (let i = game.particles.length - 1; i >= 0; i--) {
-                const p = game.particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += p.gravity;
-                p.life--;
-                if (p.life <= 0) {
-                    game.particles.splice(i, 1);
-                }
-            }
-        }
-
-        // =============================================================
-        //   🎨 ОТРИСОВКА
-        // =============================================================
-        function drawMap() {
-            // Фон
-            const grad = ctx.createRadialGradient(750, 460, 100, 750, 460, 900);
-            grad.addColorStop(0, '#14142a');
-            grad.addColorStop(1, '#080810');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
-
-            // Линии
-            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-            ctx.lineWidth = 2;
-            // Верхняя линия
-            ctx.beginPath();
-            ctx.moveTo(200, 140);
-            ctx.lineTo(1300, 140);
-            ctx.stroke();
-            // Мид
-            ctx.beginPath();
-            ctx.moveTo(200, 460);
-            ctx.lineTo(1300, 460);
-            ctx.stroke();
-            // Нижняя
-            ctx.beginPath();
-            ctx.moveTo(200, 780);
-            ctx.lineTo(1300, 780);
-            ctx.stroke();
-
-            // Кусты
-            for (const bush of MAP.bushes) {
-                ctx.fillStyle = 'rgba(30, 80, 30, 0.25)';
-                ctx.beginPath();
-                ctx.ellipse(bush.x + bush.w / 2, bush.y + bush.h / 2, bush.w / 2, bush.h / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = 'rgba(50, 120, 50, 0.15)';
-                ctx.beginPath();
-                ctx.ellipse(bush.x + bush.w / 2 - 10, bush.y + bush.h / 2 - 5, bush.w / 3, bush.h / 3, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Лесные лагеря
-            for (const camp of MAP.jungle) {
-                ctx.fillStyle = 'rgba(255, 200, 100, 0.1)';
-                ctx.beginPath();
-                ctx.arc(camp.x, camp.y, 35, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = 'rgba(255, 200, 100, 0.3)';
-                ctx.font = '20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('🌿', camp.x, camp.y + 7);
-            }
-
-            // Башни
-            for (const tower of game.towers) {
-                const color = tower.team === 1 ? '#4a7aff' : '#ff4a4a';
-                const glow = ctx.createRadialGradient(tower.x, tower.y, 5, tower.x, tower.y, 50);
-                glow.addColorStop(0, color + '40');
-                glow.addColorStop(1, 'transparent');
-                ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(tower.x, tower.y, 50, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = color;
-                ctx.shadowColor = color;
-                ctx.shadowBlur = 30;
-                ctx.beginPath();
-                ctx.arc(tower.x, tower.y, tower.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                // HP башни
-                const hpPercent = tower.hp / tower.maxHp;
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(tower.x - 25, tower.y - 45, 50, 5);
-                ctx.fillStyle = hpPercent > 0.5 ? '#4ad88a' : '#ff4477';
-                ctx.fillRect(tower.x - 25, tower.y - 45, 50 * hpPercent, 5);
-
-                // Команда
-                ctx.fillStyle = 'rgba(255,255,255,0.2)';
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(tower.team === 1 ? '🔵' : '🔴', tower.x, tower.y + 4);
-            }
-        }
-
-        function drawHero(hero) {
-            if (hero.hp <= 0) return;
-
-            const x = hero.x,
-                y = hero.y;
-
-            // Тень
-            ctx.fillStyle = 'rgba(0,0,0,0.2)';
-            ctx.beginPath();
-            ctx.ellipse(x + 3, y + 6, hero.radius * 0.6, hero.radius * 0.3, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Аура класса
-            const aura = ctx.createRadialGradient(x, y, 5, x, y, hero.radius * 1.8);
-            aura.addColorStop(0, hero.color + '25');
-            aura.addColorStop(1, 'transparent');
-            ctx.fillStyle = aura;
-            ctx.beginPath();
-            ctx.arc(x, y, hero.radius * 1.8, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Свечение
-            const glow = ctx.createRadialGradient(x - 5, y - 8, 2, x, y, hero.radius * 1.2);
-            glow.addColorStop(0, 'rgba(255,255,255,0.3)');
-            glow.addColorStop(1, hero.color + '15');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, hero.radius * 1.2, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Тело
-            ctx.shadowColor = hero.color;
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = hero.color;
-            ctx.beginPath();
-            ctx.arc(x, y, hero.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // Блик
-            ctx.fillStyle = 'rgba(255,255,255,0.25)';
-            ctx.beginPath();
-            ctx.arc(x - 7, y - 8, 7, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Иконка класса
-            ctx.font = '18px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-            ctx.fillText(hero.icon, x, y + 1);
-
-            // Имя
-            ctx.font = '10px sans-serif';
-            ctx.textBaseline = 'bottom';
-            ctx.fillStyle = hero.isPlayer ? '#ffffff' : 'rgba(255,255,255,0.4)';
-            ctx.fillText(hero.name, x, y - hero.radius - 8);
-
-            // HP бар
-            const hpPercent = hero.hp / hero.maxHp;
-            const barW = 40;
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.fillRect(x - barW / 2, y - hero.radius - 18, barW, 4);
-            ctx.fillStyle = hpPercent > 0.5 ? '#4ad88a' : '#ff4477';
-            ctx.fillRect(x - barW / 2, y - hero.radius - 18, barW * hpPercent, 4);
-
-            // Если игрок - выделение
-            if (hero.isPlayer) {
-                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 6]);
-                ctx.beginPath();
-                ctx.arc(x, y, hero.radius + 6, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
-
-            // Класс под именем
-            ctx.font = '7px sans-serif';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.fillText(CLASSES[hero.classType].name.toUpperCase(), x, y + hero.radius + 4);
-        }
-
-        function drawMinion(minion) {
-            if (minion.hp <= 0) return;
-            const color = minion.team === 1 ? '#4a7aff' : '#ff4a4a';
-            ctx.fillStyle = color + '80';
-            ctx.beginPath();
-            ctx.arc(minion.x, minion.y, 8, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.arc(minion.x, minion.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        function drawProjectiles() {
-            for (const p of game.projectiles) {
-                const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 10);
-                grad.addColorStop(0, '#ffffff');
-                grad.addColorStop(0.3, p.color);
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = p.color;
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = 20;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-        }
-
-        function drawParticles() {
-            for (const p of game.particles) {
-                const alpha = p.life / p.maxLife;
-                ctx.globalAlpha = alpha;
-                ctx.fillStyle = p.color;
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-            ctx.globalAlpha = 1;
-        }
-
-        function drawUI() {
-            // Stats update every frame from game state
-            document.getElementById('hpText').textContent = `${Math.floor(game.player?.hp || 0)}/${game.player?.maxHp || 100}`;
-            document.getElementById('hpFill').style.width = `${(game.player?.hp / game.player?.maxHp || 1) * 100}%`;
-            document.getElementById('levelText').textContent = game.level;
-            document.getElementById('killsText').textContent = game.kills;
-            document.getElementById('deathsText').textContent = game.deaths;
-            document.getElementById('goldText').textContent = game.gold;
-            const expNeeded = game.level * 100;
-            document.getElementById('expText').textContent = `${game.exp}/${expNeeded}`;
-        }
-
-        function drawMinimap() {
-            const mw = 170,
-                mh = 130;
-            miniCtx.fillStyle = 'rgba(5,5,15,0.9)';
-            miniCtx.fillRect(0, 0, mw, mh);
-
-            const scaleX = mw / W;
-            const scaleY = mh / H;
-
-            // Башни
-            for (const t of game.towers) {
-                miniCtx.fillStyle = t.team === 1 ? '#4a7aff' : '#ff4a4a';
-                miniCtx.beginPath();
-                miniCtx.arc(t.x * scaleX, t.y * scaleY, 3, 0, Math.PI * 2);
-                miniCtx.fill();
-            }
-
-            // Герои
-            for (const h of game.heroes) {
-                if (h.hp <= 0) continue;
-                miniCtx.fillStyle = h.isPlayer ? '#ffffff' : (h.team === 1 ? '#6b8aff' : '#ff6b6b');
-                miniCtx.beginPath();
-                miniCtx.arc(h.x * scaleX, h.y * scaleY, h.isPlayer ? 4 : 2, 0, Math.PI * 2);
-                miniCtx.fill();
-                if (h.isPlayer) {
-                    miniCtx.strokeStyle = '#ffffff';
-                    miniCtx.lineWidth = 1;
-                    miniCtx.beginPath();
-                    miniCtx.arc(h.x * scaleX, h.y * scaleY, 6, 0, Math.PI * 2);
-                    miniCtx.stroke();
-                }
-            }
-
-            // Минионы
-            for (const m of game.minions) {
-                if (m.hp <= 0) continue;
-                miniCtx.fillStyle = m.team === 1 ? 'rgba(100,150,255,0.3)' : 'rgba(255,100,100,0.3)';
-                miniCtx.fillRect(m.x * scaleX - 1, m.y * scaleY - 1, 2, 2);
-            }
-        }
-
-        // =============================================================
-        //   🔄 ОБНОВЛЕНИЕ ИГРЫ
-        // =============================================================
-        function updateGame() {
-            if (game.paused) return;
-            game.time++;
-
-            // Обновление героев
-            for (const hero of game.heroes) {
-                if (hero.hp <= 0) continue;
-                if (hero.attackCooldown > 0) hero.attackCooldown--;
-                // Обновление скиллов
-                for (const key in hero.skills) {
-                    if (hero.skills[key].cooldown > 0) hero.skills[key].cooldown--;
-                }
-                // Обновление ботов
-                if (!hero.isPlayer) {
-                    updateBot(hero);
-                }
-            }
-
-            // Обновление башен - атака
-            for (const tower of game.towers) {
-                if (tower.hp <= 0) continue;
-                if (tower.attackCooldown > 0) { tower.attackCooldown--; continue; }
-
-                // Поиск цели
-                let target = null;
-                let minDist = Infinity;
-                const all = [...game.heroes, ...game.minions];
-                for (const unit of all) {
-                    if (unit.hp <= 0 || unit.team === tower.team) continue;
-                    const dx = unit.x - tower.x;
-                    const dy = unit.y - tower.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < tower.attackRange && dist < minDist) {
-                        minDist = dist;
-                        target = unit;
-                    }
-                }
-                if (target) {
-                    tower.attackCooldown = 30;
-                    target.hp -= tower.damage;
-                    spawnParticles(target.x, target.y, '#ff8844', 8);
-                    if (target.hp <= 0) {
-                        target.hp = 0;
-                        // Респавн
-                        setTimeout(() => {
-                            const spawn = getSpawnPoint(target.team);
-                            target.x = spawn.x;
-                            target.y = spawn.y;
-                            target.hp = target.maxHp;
-                        }, 5000);
-                    }
-                }
-            }
-
-            // Спавн минионов
-            if (game.time % 180 === 0) {
-                for (let team = 1; team <= 2; team++) {
-                    for (const lane of ['top', 'mid', 'bot']) {
-                        const y = MAP.lanes[lane].y;
-                        const x = team === 1 ? 100 : 1400;
-                        game.minions.push({
-                            x,
-                            y: y + (Math.random() - 0.5) * 30,
-                            team,
-                            hp: 30 + game.time / 100,
-                            maxHp: 30 + game.time / 100,
-                            damage: 5 + game.time / 200,
-                            speed: 0.5 + game.time / 2000,
-                            radius: 8,
-                            targetX: team === 1 ? 1400 : 100,
-                            targetY: y + (Math.random() - 0.5) * 30,
-                            attackCooldown: 0
-                        });
-                    }
-                }
-            }
-
-            // Обновление минионов
-            for (const m of game.minions) {
-                if (m.hp <= 0) continue;
-                if (m.attackCooldown > 0) { m.attackCooldown--; }
-
-                // Движение к цели
-                const dx = m.targetX - m.x;
-                const dy = m.targetY - m.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > 5) {
-                    m.x += (dx / dist) * m.speed;
-                    m.y += (dy / dist) * m.speed;
-                }
-
-                // Поиск врагов для атаки
-                let target = null;
-                let minDist = Infinity;
-                const all = [...game.heroes, ...game.minions];
-                for (const unit of all) {
-                    if (unit === m || unit.hp <= 0 || unit.team === m.team) continue;
-                    const ddx = unit.x - m.x;
-                    const ddy = unit.y - m.y;
-                    const d = Math.sqrt(ddx * ddx + ddy * ddy);
-                    if (d < 60 && d < minDist) {
-                        minDist = d;
-                        target = unit;
-                    }
-                }
-                if (target && m.attackCooldown === 0) {
-                    target.hp -= m.damage;
-                    m.attackCooldown = 40;
-                    spawnParticles(target.x, target.y, '#ffaa44', 5);
-                    if (target.hp <= 0) {
-                        target.hp = 0;
-                        if (target.isPlayer) {
-                            game.deaths++;
-                            updateUserStats();
-                        }
-                        setTimeout(() => {
-                            const spawn = getSpawnPoint(target.team);
-                            target.x = spawn.x;
-                            target.y = spawn.y;
-                            target.hp = target.maxHp;
-                        }, 5000);
-                    }
-                }
-            }
-
-            // Обновление частиц
-            updateParticles();
-
-            // Обновление снарядов
-            for (let i = game.projectiles.length - 1; i >= 0; i--) {
-                const p = game.projectiles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life--;
-                if (p.life <= 0 || p.x < 0 || p.x > W || p.y < 0 || p.y > H) {
-                    game.projectiles.splice(i, 1);
-                }
-            }
-
-            // Проверка уровня
-            checkLevelUp();
-
-            // Обновление UI
-            drawUI();
-        }
-
-        function checkLevelUp() {
-            const needed = game.level * 100;
-            while (game.exp >= needed) {
-                game.exp -= needed;
-                game.level++;
-                if (game.player) {
-                    game.player.maxHp += 15;
-                    game.player.hp = game.player.maxHp;
-                    game.player.damage += 3;
-                    game.player.level = game.level;
-                }
-                spawnParticles(game.player.x, game.player.y, '#ffd700', 30);
-                // Обновляем в БД
-                updateUserStats();
-            }
-        }
-
-        function updateUserStats() {
-            if (!currentUser) return;
-            currentUser.level = game.level;
-            currentUser.exp = game.exp;
-            currentUser.gold = game.gold;
-            currentUser.kills = game.kills;
-            currentUser.deaths = game.deaths;
-            // Обновляем ранг
-            if (game.kills >= 50) currentUser.rank = 'Серебро';
-            if (game.kills >= 100) currentUser.rank = 'Золото';
-            if (game.kills >= 200) currentUser.rank = 'Платина';
-            if (game.kills >= 350) currentUser.rank = 'Алмаз';
-            if (game.kills >= 500) currentUser.rank = 'Мифический';
-            if (game.kills >= 750) currentUser.rank = 'Легенда';
-
-            // Сохраняем в БД
-            tursoQuery(
-                `UPDATE users SET level = ?, exp = ?, gold = ?, kills = ?, deaths = ?, rank = ? WHERE id = ?`, [
-                    game.level, game.exp, game.gold, game.kills, game.deaths, currentUser.rank, currentUser.id
-                ]
-            ).catch(console.error);
-
-            // Обновляем отображение ранга
-            document.getElementById('rankDisplay').innerHTML =
-                `<span class="rank-icon">⭐</span> ${currentUser.rank}`;
-        }
-
-        // =============================================================
-        //   🎮 УПРАВЛЕНИЕ
-        // =============================================================
-        const keys = {};
         document.addEventListener('keydown', (e) => {
-            keys[e.key.toLowerCase()] = true;
-            // Скиллы
-            const skillMap = { 'q': 0, 'w': 1, 'e': 2, 'r': 3 };
-            if (e.key.toLowerCase() in skillMap) {
-                const idx = skillMap[e.key.toLowerCase()];
-                const btns = document.querySelectorAll('.skill-btn');
-                if (btns[idx]) btns[idx].click();
+            if (e.key === 'Enter') {
+                handleAuth();
             }
         });
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
-        });
 
-        // Движение игрока
-        function movePlayer() {
-            const hero = game.player;
-            if (!hero || hero.hp <= 0) return;
-            let dx = 0,
-                dy = 0;
-            if (keys['w'] || keys['arrowup']) dy = -hero.speed;
-            if (keys['s'] || keys['arrowdown']) dy = hero.speed;
-            if (keys['a'] || keys['arrowleft']) dx = -hero.speed;
-            if (keys['d'] || keys['arrowright']) dx = hero.speed;
-
-            if (dx && dy) {
-                dx *= 0.707;
-                dy *= 0.707;
+        // ============================================================
+        //   ПРОВЕРКА ПОДКЛЮЧЕНИЯ ПРИ ЗАГРУЗКЕ
+        // ============================================================
+        async function checkConnection() {
+            try {
+                status.textContent = 'Проверка подключения...';
+                await queryDB('SELECT 1');
+                status.textContent = '✅ Подключено к серверу';
+            } catch (error) {
+                status.textContent = '❌ Нет подключения к серверу';
+                authError.textContent = 'Не удалось подключиться к базе данных. Проверьте интернет.';
+                console.error(error);
             }
-
-            hero.x = Math.max(20, Math.min(W - 20, hero.x + dx));
-            hero.y = Math.max(20, Math.min(H - 20, hero.y + dy));
         }
 
-        // Клик для атаки/движения
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const mx = (e.clientX - rect.left) * scaleX;
-            const my = (e.clientY - rect.top) * scaleY;
-
-            const hero = game.player;
-            if (!hero || hero.hp <= 0) return;
-
-            // Поиск цели для атаки
-            let target = null;
-            let minDist = Infinity;
-            const all = [...game.heroes, ...game.minions];
-            for (const unit of all) {
-                if (unit === hero || unit.team === hero.team || unit.hp <= 0) continue;
-                const dx = unit.x - mx;
-                const dy = unit.y - my;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 60 && dist < minDist) {
-                    minDist = dist;
-                    target = unit;
-                }
-            }
-
-            if (target) {
-                hero.target = target;
-                // Атака
-                if (hero.attackCooldown === 0) {
-                    attackTarget(hero, target);
-                }
-            } else {
-                hero.target = null;
-                hero.targetX = mx;
-                hero.targetY = my;
-                hero.moving = true;
-            }
-        });
-
-        // Скиллы
-        document.querySelectorAll('.skill-btn').forEach((btn, idx) => {
-            btn.addEventListener('click', () => {
-                const hero = game.player;
-                if (!hero || hero.hp <= 0) return;
-                const keys2 = ['q', 'w', 'e', 'r'];
-                const key = keys2[idx];
-                const skill = hero.skills[key];
-                if (!skill || skill.cooldown > 0) return;
-
-                skill.cooldown = skill.maxCooldown;
-
-                // Эффекты скиллов
-                const cdOverlay = btn.querySelector('.cd-overlay');
-                cdOverlay.style.display = 'flex';
-                cdOverlay.textContent = skill.maxCooldown / 20;
-
-                // Анимация
-                btn.style.transform = 'scale(0.9)';
-                setTimeout(() => btn.style.transform = '', 200);
-
-                // Применение скилла
-                if (skill.type === 'damage') {
-                    // Поиск ближайшего врага
-                    let target = null;
-                    let minDist = Infinity;
-                    for (const unit of [...game.heroes, ...game.minions]) {
-                        if (unit === hero || unit.team === hero.team || unit.hp <= 0) continue;
-                        const dx = unit.x - hero.x;
-                        const dy = unit.y - hero.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 350 && dist < minDist) {
-                            minDist = dist;
-                            target = unit;
-                        }
-                    }
-                    if (target) {
-                        const dmg = hero.damage * skill.damage;
-                        target.hp -= dmg;
-                        spawnParticles(target.x, target.y, '#ff44ff', 25);
-                        // Снаряд
-                        game.projectiles.push({
-                            x: hero.x,
-                            y: hero.y,
-                            vx: (target.x - hero.x) / 20,
-                            vy: (target.y - hero.y) / 20,
-                            life: 30,
-                            color: '#ff44ff'
-                        });
-                        if (target.hp <= 0) {
-                            target.hp = 0;
-                            hero.kills++;
-                            hero.gold += 50;
-                            hero.exp += 30;
-                            if (hero.isPlayer) {
-                                game.kills++;
-                                game.gold += 50;
-                                game.exp += 30;
-                                updateUserStats();
-                                checkLevelUp();
-                            }
-                            setTimeout(() => {
-                                const spawn = getSpawnPoint(target.team);
-                                target.x = spawn.x;
-                                target.y = spawn.y;
-                                target.hp = target.maxHp;
-                            }, 5000);
-                        }
-                    }
-                } else if (skill.type === 'heal') {
-                    hero.hp = Math.min(hero.maxHp, hero.hp + hero.maxHp * 0.3);
-                    spawnParticles(hero.x, hero.y, '#4ad88a', 20);
-                }
-
-                // Обновление кулдауна на кнопке
-                const interval = setInterval(() => {
-                    const remaining = skill.cooldown / 20;
-                    if (remaining <= 0) {
-                        clearInterval(interval);
-                        cdOverlay.style.display = 'none';
-                        return;
-                    }
-                    cdOverlay.textContent = Math.ceil(remaining);
-                }, 50);
-            });
-        });
-
-        // =============================================================
-        //   🚀 ЗАПУСК ИГРЫ
-        // =============================================================
-        function startGame(user) {
-            game.gold = user.gold || 500;
-            game.exp = user.exp || 0;
-            game.level = user.level || 1;
-            game.kills = user.kills || 0;
-            game.deaths = user.deaths || 0;
-
-            document.getElementById('playerName').textContent = user.username;
-            document.getElementById('clanName').textContent = `⚔️ ${user.clan || 'Без клана'}`;
-            document.getElementById('rankDisplay').innerHTML =
-                `<span class="rank-icon">⭐</span> ${user.rank || 'Бронза'}`;
-
-            // Создание героев
-            const classType = user.class || 'fighter';
-            const cls = CLASSES[classType];
-            const player = createHero(150, 460, classType, 1, user.username);
-            player.isPlayer = true;
-            player.hp = cls.hp + (user.level - 1) * 15;
-            player.maxHp = cls.hp + (user.level - 1) * 15;
-            player.damage = cls.dmg + (user.level - 1) * 3;
-            player.level = user.level;
-
-            game.player = player;
-            game.heroes = [player];
-
-            // Боты (команда 1 + 2)
-            const botClasses = ['fighter', 'assassin', 'mage', 'tank', 'support'];
-            const botNames = ['Аиша', 'Брут', 'Киара', 'Дорн', 'Фэй', 'Грим', 'Хельга', 'Иван', 'Джек', 'Кира', 'Люк', 'Макс',
-                'Нина', 'Оливер', 'Питер'
-            ];
-
-            // Союзные боты (команда 1)
-            for (let i = 0; i < 4; i++) {
-                const clsName = botClasses[i % botClasses.length];
-                const bot = createHero(
-                    120 + Math.random() * 100,
-                    200 + i * 100,
-                    clsName,
-                    1,
-                    botNames[i % botNames.length]
-                );
-                game.heroes.push(bot);
-            }
-
-            // Вражеские боты (команда 2)
-            for (let i = 0; i < 5; i++) {
-                const clsName = botClasses[(i + 2) % botClasses.length];
-                const bot = createHero(
-                    1380 - Math.random() * 100,
-                    200 + i * 100,
-                    clsName,
-                    2,
-                    botNames[(i + 5) % botNames.length]
-                );
-                game.heroes.push(bot);
-            }
-
-            game.towers = createTowers();
-            game.minions = [];
-            game.projectiles = [];
-            game.particles = [];
-
-            // Основной цикл
-            function gameLoop() {
-                // Движение игрока
-                movePlayer();
-
-                // Обновление игры
-                updateGame();
-
-                // Отрисовка
-                ctx.clearRect(0, 0, W, H);
-                drawMap();
-
-                // Рисуем минионов
-                for (const m of game.minions) drawMinion(m);
-
-                // Рисуем героев
-                for (const h of game.heroes) drawHero(h);
-
-                // Рисуем снаряды и частицы
-                drawProjectiles();
-                drawParticles();
-
-                // Мини-карта
-                drawMinimap();
-
-                // UI
-                drawUI();
-
-                requestAnimationFrame(gameLoop);
-            }
-
-            gameLoop();
-        }
-
-        // =============================================================
-        //   📦 SQL ДЛЯ БАЗЫ ДАННЫХ (Turso)
-        // =============================================================
-        console.log(`
-        -- ==========================================
-        --   LUMOBA — SQL СХЕМА ДЛЯ TURSO
-        -- ==========================================
-
-        ${SQL_SCHEMA}
-
-        -- Пример вставки пользователя:
-        INSERT INTO users (username, password, rank, level, exp, gold, class, clan)
-        VALUES ('player1', 'hash_12345', 'Бронза', 1, 0, 500, 'fighter', 'Легион');
-
-        -- Получить топ игроков по убийствам:
-        SELECT username, kills, deaths, rank, level FROM users ORDER BY kills DESC LIMIT 10;
-
-        -- Получить статистику матчей:
-        SELECT u.username, m.kills, m.deaths, m.result, m.played_at
-        FROM matches m JOIN users u ON m.user_id = u.id
-        ORDER BY m.played_at DESC LIMIT 20;
-        `);
+        // Запускаем проверку
+        checkConnection();
     </script>
 </body>
 </html>
