@@ -127,9 +127,35 @@
             text-align: center;
             opacity: 0.5;
         }
+        #status.connected {
+            color: #4ad88a;
+        }
+        #status.error {
+            color: #ff4477;
+        }
         .loading {
             opacity: 0.5;
             pointer-events: none;
+        }
+        #statsBox {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        #statsBox .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+        #statsBox .stat-row .label {
+            opacity: 0.5;
+        }
+        #statsBox .stat-row .value {
+            font-weight: 600;
         }
     </style>
 </head>
@@ -146,29 +172,15 @@
         </div>
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
-        <div id="status">Подключение...</div>
+        <div id="status">Проверка сервера...</div>
+        <div id="statsBox"></div>
     </div>
 
     <script>
         // ============================================================
-        //   ПРОСТАЯ РАБОТА С TURSO
+        //   НАСТРОЙКИ
         // ============================================================
-        const DB_URL = 'https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query';
-        const TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA';
-
-        async function sendSQL(sql) {
-            const response = await fetch(DB_URL, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    statements: [{ sql: sql }]
-                })
-            });
-            return await response.json();
-        }
+        const API_URL = 'https://lumoba-server.onrender.com';
 
         // ============================================================
         //   DOM
@@ -181,35 +193,40 @@
         const error = document.getElementById('authError');
         const success = document.getElementById('success');
         const status = document.getElementById('status');
+        const statsBox = document.getElementById('statsBox');
 
         let isLogin = true;
+        let currentUser = null;
 
         // ============================================================
-        //   СОЗДАНИЕ ТАБЛИЦЫ
+        //   ФУНКЦИИ
         // ============================================================
-        async function createTable() {
+        async function apiCall(endpoint, data) {
+            const response = await fetch(`${API_URL}/${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        }
+
+        async function checkServer() {
             try {
-                await sendSQL(`
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT UNIQUE,
-                        password TEXT,
-                        rank TEXT DEFAULT 'Бронза',
-                        level INTEGER DEFAULT 1
-                    )
-                `);
-                status.textContent = '✅ Готово';
-                return true;
+                const response = await fetch(`${API_URL}/top`);
+                if (response.ok) {
+                    status.textContent = '✅ Сервер работает';
+                    status.className = 'connected';
+                    return true;
+                }
             } catch (e) {
-                status.textContent = '❌ Ошибка';
-                error.textContent = 'Не могу подключиться к БД';
+                status.textContent = '❌ Сервер не запущен! Запустите server.py';
+                status.className = 'error';
                 return false;
             }
         }
 
-        // ============================================================
-        //   ВХОД
-        // ============================================================
         async function loginUser() {
             const username = login.value.trim();
             const password = pass.value.trim();
@@ -226,29 +243,24 @@
             regBtn.classList.add('loading');
 
             try {
-                await createTable();
+                const result = await apiCall('login', { username, password });
 
-                const result = await sendSQL(`
-                    SELECT * FROM users 
-                    WHERE username = '${username}' 
-                    AND password = '${password}'
-                `);
-
-                const rows = result.results?.[0]?.response?.result?.rows || [];
-
-                if (rows.length === 0) {
-                    error.textContent = '❌ Неверный логин или пароль';
+                if (result.error) {
+                    error.textContent = '❌ ' + result.error;
                     return;
                 }
 
-                const user = rows[0];
+                currentUser = result.user;
                 success.style.display = 'block';
-                success.textContent = `✅ Привет, ${user.username}! (Уровень ${user.level})`;
-                status.textContent = `👋 ${user.username}`;
+                success.textContent = `✅ Привет, ${currentUser.username}!`;
+                status.textContent = `👋 ${currentUser.username} (Уровень ${currentUser.level})`;
                 error.textContent = '';
 
+                // Показываем статистику
+                showStats(currentUser);
+
             } catch (e) {
-                error.textContent = '❌ Ошибка сервера';
+                error.textContent = '❌ Ошибка: ' + e.message;
                 console.error(e);
             } finally {
                 authBtn.classList.remove('loading');
@@ -256,9 +268,6 @@
             }
         }
 
-        // ============================================================
-        //   РЕГИСТРАЦИЯ
-        // ============================================================
         async function registerUser() {
             const username = login.value.trim();
             const password = pass.value.trim();
@@ -275,41 +284,65 @@
             regBtn.classList.add('loading');
 
             try {
-                await createTable();
+                const result = await apiCall('register', { username, password });
 
-                // Проверка существования
-                const check = await sendSQL(`
-                    SELECT id FROM users WHERE username = '${username}'
-                `);
-
-                const exists = check.results?.[0]?.response?.result?.rows || [];
-
-                if (exists.length > 0) {
-                    error.textContent = '❌ Пользователь уже существует';
+                if (result.error) {
+                    error.textContent = '❌ ' + result.error;
                     return;
                 }
-
-                // Создание
-                await sendSQL(`
-                    INSERT INTO users (username, password) 
-                    VALUES ('${username}', '${password}')
-                `);
 
                 success.style.display = 'block';
                 success.textContent = '✅ Аккаунт создан! Теперь войдите.';
                 status.textContent = '✅ Регистрация успешна!';
 
-                // Очищаем поля
                 login.value = '';
                 pass.value = '';
 
             } catch (e) {
-                error.textContent = '❌ Ошибка сервера';
+                error.textContent = '❌ Ошибка: ' + e.message;
                 console.error(e);
             } finally {
                 authBtn.classList.remove('loading');
                 regBtn.classList.remove('loading');
             }
+        }
+
+        function showStats(user) {
+            statsBox.style.display = 'block';
+            statsBox.innerHTML = `
+                <div class="stat-row">
+                    <span class="label">👤 Имя</span>
+                    <span class="value">${user.username}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">⭐ Ранг</span>
+                    <span class="value">${user.rank}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">⚔️ Уровень</span>
+                    <span class="value">${user.level}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">💀 Убийства</span>
+                    <span class="value">${user.kills}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">🪦 Смерти</span>
+                    <span class="value">${user.deaths}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">🪙 Золото</span>
+                    <span class="value" style="color:#ffd866;">${user.gold}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">🎯 Класс</span>
+                    <span class="value">${user.class}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="label">🏰 Клан</span>
+                    <span class="value">${user.clan}</span>
+                </div>
+            `;
         }
 
         // ============================================================
@@ -330,6 +363,7 @@
             switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
             error.textContent = '';
             success.style.display = 'none';
+            statsBox.style.display = 'none';
         });
 
         switchMode.addEventListener('click', () => {
@@ -339,6 +373,7 @@
             switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
             error.textContent = '';
             success.style.display = 'none';
+            statsBox.style.display = 'none';
         });
 
         document.addEventListener('keydown', (e) => {
@@ -350,7 +385,7 @@
         // ============================================================
         //   ЗАПУСК
         // ============================================================
-        createTable();
+        checkServer();
     </script>
 </body>
 </html>
