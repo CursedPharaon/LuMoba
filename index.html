@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumoba - Вход</title>
+    <title>Lumoba</title>
     <style>
         * {
             margin: 0;
@@ -143,9 +143,6 @@
             color: #ff4477;
             opacity: 1;
         }
-        .hidden {
-            display: none !important;
-        }
         #statsBox {
             margin-top: 16px;
             padding: 16px;
@@ -195,31 +192,27 @@
         </div>
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
-        <div id="status">🔄 Проверка подключения...</div>
+        <div id="status">🔄 Проверка сервера...</div>
         <div id="statsBox"></div>
     </div>
 
     <script>
         // ============================================================
-        //   НАСТРОЙКИ TURSO
+        //   НАСТРОЙКИ - ЗДЕСЬ ВАША ССЫЛКА НА RENDER
         // ============================================================
-        const DB_URL = "https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query";
-        const DB_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA";
+        const API_URL = 'https://YOUR_RENDER_URL.onrender.com/api/query'; // ЗАМЕНИТЕ!
 
         // ============================================================
-        //   ФУНКЦИЯ ЗАПРОСА К БАЗЕ
+        //   ФУНКЦИЯ ЗАПРОСА К ПРОКСИ
         // ============================================================
         async function queryTurso(sql) {
             try {
-                const response = await fetch(DB_URL, {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${DB_TOKEN}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        statements: [{ sql: sql }]
-                    })
+                    body: JSON.stringify({ sql: sql })
                 });
 
                 if (!response.ok) {
@@ -241,11 +234,6 @@
         function safeString(val) {
             if (val === null || val === undefined) return '';
             return String(val);
-        }
-
-        function safeNumber(val) {
-            if (val === null || val === undefined) return 0;
-            return Number(val) || 0;
         }
 
         function safeInt(val) {
@@ -330,17 +318,14 @@
 
             authBtn.disabled = true;
             authBtn.textContent = '⏳ Подключение...';
-            status.textContent = '🔄 Подключение...';
+            status.textContent = '🔄 Проверка...';
             status.className = '';
 
             try {
-                // Создаём таблицу если нет
                 await initDB();
 
-                // Экранируем кавычки
                 const safeName = username.replace(/'/g, "''");
 
-                // Ищем пользователя
                 const result = await queryTurso(
                     `SELECT id, username, rank, level, gold, kills, deaths, exp, class, clan FROM users WHERE username = '${safeName}'`
                 );
@@ -360,7 +345,7 @@
 
                 currentUser = {
                     id: user[0],
-                    username: safeString(user[0]),
+                    username: safeString(user[1]),
                     rank: safeString(user[2]),
                     level: safeInt(user[3]),
                     gold: safeInt(user[4]),
@@ -376,7 +361,6 @@
                 status.textContent = `👋 ${username} (Уровень ${currentUser.level})`;
                 status.className = 'connected';
 
-                // Показываем статистику
                 showStats(currentUser);
 
             } catch (error) {
@@ -412,14 +396,11 @@
             status.className = '';
 
             try {
-                // Создаём таблицу если нет
                 await initDB();
 
-                // Экранируем кавычки
                 const safeName = username.replace(/'/g, "''");
                 const safePass = password.replace(/'/g, "''");
 
-                // Проверяем существование
                 const check = await queryTurso(
                     `SELECT id FROM users WHERE username = '${safeName}'`
                 );
@@ -430,7 +411,6 @@
                     throw new Error('❌ Пользователь уже существует');
                 }
 
-                // Создаём пользователя
                 await queryTurso(
                     `INSERT INTO users (username, password) VALUES ('${safeName}', '${safePass}')`
                 );
@@ -443,7 +423,6 @@
                 authLogin.value = '';
                 authPass.value = '';
 
-                // Переключаем на вход
                 isLoginMode = true;
                 authBtn.textContent = 'Войти';
                 regBtn.textContent = 'Регистрация';
@@ -543,24 +522,29 @@
         });
 
         // ============================================================
-        //   ПРОВЕРКА ПОДКЛЮЧЕНИЯ
+        //   ПРОВЕРКА СЕРВЕРА
         // ============================================================
-        async function checkConnection() {
+        async function checkServer() {
             try {
-                status.textContent = '🔄 Проверка подключения...';
-                await queryTurso('SELECT 1');
-                status.textContent = '✅ Turso онлайн!';
-                status.className = 'connected';
+                status.textContent = '🔄 Проверка сервера...';
+                const response = await fetch(API_URL.replace('/query', ''), {
+                    method: 'GET'
+                });
+                if (response.ok) {
+                    status.textContent = '✅ Сервер работает!';
+                    status.className = 'connected';
+                } else {
+                    throw new Error('Сервер не отвечает');
+                }
             } catch (error) {
-                console.error('Ошибка подключения:', error);
-                status.textContent = '⚠️ Turso недоступна';
+                console.error('Ошибка:', error);
+                status.textContent = '⚠️ Сервер недоступен. Проверьте ссылку.';
                 status.className = 'error';
-                authError.textContent = '⚠️ Не удалось подключиться к базе данных';
+                authError.textContent = '⚠️ Сервер не запущен. Залейте main.py на Render.';
             }
         }
 
-        // Запускаем проверку
-        checkConnection();
+        checkServer();
     </script>
 </body>
 </html>
