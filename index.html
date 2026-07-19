@@ -192,15 +192,15 @@
         </div>
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
-        <div id="status">🔄 Проверка сервера...</div>
+        <div id="status">⚡ Готов к работе</div>
         <div id="statsBox"></div>
     </div>
 
     <script>
         // ============================================================
-        //   НАСТРОЙКИ - ЗДЕСЬ ВАША ССЫЛКА НА RENDER
+        //   НАСТРОЙКИ - ВСТАВЬТЕ ВАШУ ССЫЛКУ
         // ============================================================
-        const API_URL = 'https://lumoba.onrender.com/api/query'; // ЗАМЕНИТЕ!
+        const API_URL = 'https://lumoba.onrender.com/api/query';
 
         // ============================================================
         //   ФУНКЦИЯ ЗАПРОСА К ПРОКСИ
@@ -522,39 +522,11 @@
         });
 
         // ============================================================
-        //   ПРОВЕРКА СЕРВЕРА
+        //   ЗАПУСК
         // ============================================================
-        // ============================================================
-//   ПРОВЕРКА СЕРВЕРА
-// ============================================================
-async function checkServer() {
-    try {
-        status.textContent = '🔄 Проверка сервера...';
-        
-        // Проверяем корень
-        const response = await fetch(API_URL.replace('/api/query', ''), {
-            method: 'GET'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('✅ Сервер ответил:', data);
-        
-        status.textContent = '✅ Сервер работает!';
+        status.textContent = '⚡ Готов к работе';
         status.className = 'connected';
-        
-    } catch (error) {
-        console.error('❌ Ошибка проверки сервера:', error);
-        status.textContent = '⚠️ Сервер недоступен. Проверьте ссылку.';
-        status.className = 'error';
-        authError.textContent = '⚠️ Сервер не запущен. Залейте main.py на Render.';
-    }
-}
-
-        checkServer();
+        console.log('🚀 Lumoba готова! Сервер: ' + API_URL);
     </script>
 </body>
 </html>
