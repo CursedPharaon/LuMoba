@@ -177,6 +177,22 @@
         .rank-diamond { background: rgba(185, 242, 255, 0.2); color: #b9f2ff; }
         .rank-mythic { background: rgba(255, 107, 255, 0.2); color: #ff6bff; }
         .rank-legend { background: rgba(255, 51, 102, 0.2); color: #ff3366; }
+        #debug {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            word-break: break-all;
+            max-height: 100px;
+            overflow: auto;
+            display: none;
+            font-family: monospace;
+        }
+        #debug.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -193,20 +209,33 @@
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
         <div id="status">⚡ Готов к работе</div>
+        <div id="debug" class="show"></div>
         <div id="statsBox"></div>
     </div>
 
     <script>
         // ============================================================
-        //   НАСТРОЙКИ - ВСТАВЬТЕ ВАШУ ССЫЛКУ
+        //   НАСТРОЙКИ
         // ============================================================
-        const API_URL = 'https://lumoba.onrender.com/api/query';
+        const API_URL = 'https://lumoba.onrender.com/';
 
         // ============================================================
-        //   ФУНКЦИЯ ЗАПРОСА К ПРОКСИ
+        //   ОТЛАДКА
+        // ============================================================
+        function debugLog(msg) {
+            const el = document.getElementById('debug');
+            el.textContent += msg + '\n';
+            el.scrollTop = el.scrollHeight;
+            console.log(msg);
+        }
+
+        // ============================================================
+        //   ФУНКЦИЯ ЗАПРОСА
         // ============================================================
         async function queryTurso(sql) {
             try {
+                debugLog(`📤 SQL: ${sql.substring(0, 60)}...`);
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -215,21 +244,38 @@
                     body: JSON.stringify({ sql: sql })
                 });
 
+                debugLog(`📊 Статус: ${response.status}`);
+
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    const text = await response.text();
+                    debugLog(`❌ HTTP ${response.status}: ${text.substring(0, 100)}`);
+                    throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}`);
                 }
 
-                const data = await response.json();
-                return data;
+                const text = await response.text();
+                debugLog(`📦 Ответ: ${text.substring(0, 150)}...`);
+                
+                if (!text || text.trim() === '') {
+                    debugLog(`❌ Пустой ответ`);
+                    throw new Error('Пустой ответ от сервера');
+                }
+
+                try {
+                    const data = JSON.parse(text);
+                    debugLog(`✅ JSON получен`);
+                    return data;
+                } catch (e) {
+                    debugLog(`❌ Не JSON: ${text.substring(0, 100)}`);
+                    throw new Error(`Сервер вернул не JSON: ${text.substring(0, 100)}`);
+                }
             } catch (error) {
-                console.error('Ошибка запроса:', error);
+                debugLog(`💥 ${error.message}`);
                 throw error;
             }
         }
 
         // ============================================================
-        //   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        //   ВСПОМОГАТЕЛЬНЫЕ
         // ============================================================
         function safeString(val) {
             if (val === null || val === undefined) return '';
@@ -256,7 +302,7 @@
         }
 
         // ============================================================
-        //   DOM ЭЛЕМЕНТЫ
+        //   DOM
         // ============================================================
         const authLogin = document.getElementById('authLogin');
         const authPass = document.getElementById('authPass');
@@ -272,7 +318,7 @@
         let currentUser = null;
 
         // ============================================================
-        //   СОЗДАНИЕ ТАБЛИЦЫ
+        //   ИНИЦИАЛИЗАЦИЯ БД
         // ============================================================
         async function initDB() {
             try {
@@ -293,9 +339,10 @@
                     )
                 `;
                 await queryTurso(sql);
+                debugLog('✅ Таблица готова');
                 return true;
             } catch (error) {
-                console.error('Ошибка создания таблицы:', error);
+                debugLog(`❌ Ошибка таблицы: ${error.message}`);
                 return false;
             }
         }
@@ -318,10 +365,9 @@
 
             authBtn.disabled = true;
             authBtn.textContent = '⏳ Подключение...';
-            status.textContent = '🔄 Проверка...';
-            status.className = '';
 
             try {
+                debugLog(`🔍 Вход: ${username}`);
                 await initDB();
 
                 const safeName = username.replace(/'/g, "''");
@@ -345,7 +391,7 @@
 
                 currentUser = {
                     id: user[0],
-                    username: safeString(user[1]),
+                    username: safeString(user[0]),
                     rank: safeString(user[2]),
                     level: safeInt(user[3]),
                     gold: safeInt(user[4]),
@@ -364,7 +410,7 @@
                 showStats(currentUser);
 
             } catch (error) {
-                console.error('Ошибка входа:', error);
+                debugLog(`❌ ${error.message}`);
                 authError.textContent = error.message || '❌ Ошибка входа';
                 status.textContent = '❌ Ошибка входа';
                 status.className = 'error';
@@ -392,10 +438,9 @@
 
             authBtn.disabled = true;
             authBtn.textContent = '⏳ Подключение...';
-            status.textContent = '🔄 Регистрация...';
-            status.className = '';
 
             try {
+                debugLog(`📝 Регистрация: ${username}`);
                 await initDB();
 
                 const safeName = username.replace(/'/g, "''");
@@ -429,7 +474,7 @@
                 switchMode.textContent = 'Нет аккаунта? Зарегистрируйтесь';
 
             } catch (error) {
-                console.error('Ошибка регистрации:', error);
+                debugLog(`❌ ${error.message}`);
                 authError.textContent = error.message || '❌ Ошибка регистрации';
                 status.textContent = '❌ Ошибка регистрации';
                 status.className = 'error';
@@ -440,7 +485,7 @@
         }
 
         // ============================================================
-        //   ПОКАЗ СТАТИСТИКИ
+        //   СТАТИСТИКА
         // ============================================================
         function showStats(user) {
             statsBox.style.display = 'block';
@@ -485,7 +530,7 @@
         }
 
         // ============================================================
-        //   ОБРАБОТЧИКИ СОБЫТИЙ
+        //   СОБЫТИЯ
         // ============================================================
         authBtn.addEventListener('click', () => {
             if (isLoginMode) {
@@ -522,11 +567,38 @@
         });
 
         // ============================================================
-        //   ЗАПУСК
+        //   ПРОВЕРКА
         // ============================================================
-        status.textContent = '⚡ Готов к работе';
-        status.className = 'connected';
-        console.log('🚀 Lumoba готова! Сервер: ' + API_URL);
+        async function checkServer() {
+            try {
+                debugLog('🔍 Проверка сервера...');
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sql: 'SELECT 1' })
+                });
+                
+                const text = await response.text();
+                debugLog(`📦 Ответ: ${text.substring(0, 100)}`);
+                
+                if (text.includes('status') || text.includes('ok')) {
+                    debugLog('✅ Сервер работает!');
+                    status.textContent = '✅ Сервер работает!';
+                    status.className = 'connected';
+                } else {
+                    debugLog('⚠️ Странный ответ');
+                }
+            } catch (error) {
+                debugLog(`❌ ${error.message}`);
+                status.textContent = '⚠️ Сервер недоступен';
+                status.className = 'error';
+            }
+        }
+
+        // ЗАПУСК
+        debugLog('🚀 Lumoba запущена');
+        debugLog(`📡 API: ${API_URL}`);
+        checkServer();
     </script>
 </body>
 </html>
