@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumoba</title>
+    <title>Lumoba - Вход</title>
     <style>
         * {
             margin: 0;
@@ -24,7 +24,7 @@
             border: 1px solid rgba(100, 80, 255, 0.2);
             border-radius: 24px;
             padding: 48px 40px;
-            width: 400px;
+            width: 420px;
             box-shadow: 0 0 80px rgba(80, 60, 200, 0.15);
         }
         #authBox h1 {
@@ -34,18 +34,19 @@
             background: linear-gradient(135deg, #8b7aff, #5b6bff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         #authBox .subtitle {
             text-align: center;
-            opacity: 0.5;
-            font-size: 13px;
-            margin-bottom: 32px;
+            opacity: 0.4;
+            font-size: 12px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
         }
         #authBox input {
             width: 100%;
             padding: 14px 18px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
@@ -64,7 +65,7 @@
         #authBox .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 6px;
+            margin-top: 4px;
         }
         #authBox button {
             flex: 1;
@@ -81,8 +82,14 @@
             color: #fff;
             box-shadow: 0 4px 20px rgba(80, 60, 255, 0.3);
         }
-        #authBox .btn-primary:hover {
+        #authBox .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(80, 60, 255, 0.4);
+        }
+        #authBox .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         #authBox .btn-secondary {
             background: rgba(255, 255, 255, 0.06);
@@ -96,73 +103,89 @@
             color: #ff4477;
             font-size: 13px;
             text-align: center;
-            margin-top: 12px;
+            margin-top: 10px;
             min-height: 20px;
         }
         #authBox .switch-mode {
             text-align: center;
-            margin-top: 16px;
+            margin-top: 14px;
             font-size: 13px;
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: pointer;
             transition: 0.3s;
         }
         #authBox .switch-mode:hover {
-            opacity: 0.8;
+            opacity: 0.7;
         }
         #success {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 16px;
             background: rgba(74, 216, 138, 0.1);
             border-radius: 12px;
             border: 1px solid rgba(74, 216, 138, 0.2);
-            margin-top: 16px;
+            margin-top: 14px;
             color: #4ad88a;
             font-weight: 600;
+            font-size: 14px;
         }
         #status {
-            margin-top: 12px;
+            margin-top: 10px;
             font-size: 12px;
             text-align: center;
             opacity: 0.5;
         }
         #status.connected {
             color: #4ad88a;
+            opacity: 1;
         }
         #status.error {
             color: #ff4477;
+            opacity: 1;
         }
-        .loading {
-            opacity: 0.5;
-            pointer-events: none;
+        .hidden {
+            display: none !important;
         }
         #statsBox {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.04);
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: none;
         }
         #statsBox .stat-row {
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            font-size: 14px;
+            font-size: 13px;
         }
         #statsBox .stat-row .label {
-            opacity: 0.5;
+            opacity: 0.4;
         }
         #statsBox .stat-row .value {
             font-weight: 600;
         }
+        .rank-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .rank-bronze { background: rgba(205, 127, 50, 0.2); color: #cd7f32; }
+        .rank-silver { background: rgba(192, 192, 192, 0.2); color: #c0c0c0; }
+        .rank-gold { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+        .rank-platinum { background: rgba(229, 228, 226, 0.2); color: #e5e4e2; }
+        .rank-diamond { background: rgba(185, 242, 255, 0.2); color: #b9f2ff; }
+        .rank-mythic { background: rgba(255, 107, 255, 0.2); color: #ff6bff; }
+        .rank-legend { background: rgba(255, 51, 102, 0.2); color: #ff3366; }
     </style>
 </head>
 <body>
     <div id="authBox">
         <h1>✦ LUMOBA</h1>
-        <div class="subtitle">Вход в игру</div>
+        <div class="subtitle">ВХОД В ИГРУ</div>
         <div id="authError" class="error"></div>
         <input type="text" id="authLogin" placeholder="Логин">
         <input type="password" id="authPass" placeholder="Пароль">
@@ -172,141 +195,274 @@
         </div>
         <div class="switch-mode" id="switchMode">Нет аккаунта? Зарегистрируйтесь</div>
         <div id="success">✅ Успешно!</div>
-        <div id="status">Проверка сервера...</div>
+        <div id="status">🔄 Проверка подключения...</div>
         <div id="statsBox"></div>
     </div>
 
     <script>
         // ============================================================
-        //   НАСТРОЙКИ
+        //   НАСТРОЙКИ TURSO
         // ============================================================
-        const API_URL = 'https://lumoba-server.onrender.com/api';
+        const DB_URL = "https://lumoba-cursedd.aws-eu-west-1.turso.io/v1/query";
+        const DB_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQ0MTAwMDksImlkIjoiMDE5Zjc3MWYtOTQwMS03ZjFkLWE3ZWUtYjEyYzVjYjI4NTA3Iiwia2lkIjoicWpYbEhLbElGQmJNX29uRDlaWEkyWFVfazVBT3h3X3JIMF9TcUZ6MmU0ZyIsInJpZCI6ImIxMDIxMzYxLWQ3ZGEtNGMzNC05MWQ4LWVjMTU4ZGUwNmU2ZCJ9.GBhD9cLc9UJvMUL1hK6lixqtZ1MwPLbII9fXgaYG2txsUUn9NRkI-5W3r3PXRJHgfFrEUbNT_52pOx4JV6bmDA";
 
         // ============================================================
-        //   DOM
+        //   ФУНКЦИЯ ЗАПРОСА К БАЗЕ
         // ============================================================
-        const login = document.getElementById('authLogin');
-        const pass = document.getElementById('authPass');
+        async function queryTurso(sql) {
+            try {
+                const response = await fetch(DB_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DB_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        statements: [{ sql: sql }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Ошибка запроса:', error);
+                throw error;
+            }
+        }
+
+        // ============================================================
+        //   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================================================
+        function safeString(val) {
+            if (val === null || val === undefined) return '';
+            return String(val);
+        }
+
+        function safeNumber(val) {
+            if (val === null || val === undefined) return 0;
+            return Number(val) || 0;
+        }
+
+        function safeInt(val) {
+            if (val === null || val === undefined) return 0;
+            return parseInt(val) || 0;
+        }
+
+        function getRankBadge(rank) {
+            const ranks = {
+                'Бронза': 'bronze',
+                'Серебро': 'silver',
+                'Золото': 'gold',
+                'Платина': 'platinum',
+                'Алмаз': 'diamond',
+                'Мифический': 'mythic',
+                'Легенда': 'legend'
+            };
+            const cls = ranks[rank] || 'bronze';
+            return `<span class="rank-badge rank-${cls}">${rank}</span>`;
+        }
+
+        // ============================================================
+        //   DOM ЭЛЕМЕНТЫ
+        // ============================================================
+        const authLogin = document.getElementById('authLogin');
+        const authPass = document.getElementById('authPass');
         const authBtn = document.getElementById('authBtn');
         const regBtn = document.getElementById('regBtn');
         const switchMode = document.getElementById('switchMode');
-        const error = document.getElementById('authError');
+        const authError = document.getElementById('authError');
         const success = document.getElementById('success');
         const status = document.getElementById('status');
         const statsBox = document.getElementById('statsBox');
 
-        let isLogin = true;
+        let isLoginMode = true;
         let currentUser = null;
 
         // ============================================================
-        //   ФУНКЦИИ
+        //   СОЗДАНИЕ ТАБЛИЦЫ
         // ============================================================
-        async function apiCall(endpoint, data) {
-            const response = await fetch(`${API_URL}/${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            return await response.json();
-        }
-
-        async function checkServer() {
+        async function initDB() {
             try {
-                const response = await fetch(`${API_URL}/top`);
-                if (response.ok) {
-                    status.textContent = '✅ Сервер работает';
-                    status.className = 'connected';
-                    return true;
-                }
-            } catch (e) {
-                status.textContent = '❌ Сервер не запущен! Запустите server.py';
-                status.className = 'error';
+                const sql = `
+                    CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT UNIQUE NOT NULL,
+                        password TEXT NOT NULL,
+                        rank TEXT DEFAULT 'Бронза',
+                        level INTEGER DEFAULT 1,
+                        gold INTEGER DEFAULT 500,
+                        kills INTEGER DEFAULT 0,
+                        deaths INTEGER DEFAULT 0,
+                        exp INTEGER DEFAULT 0,
+                        class TEXT DEFAULT 'fighter',
+                        clan TEXT DEFAULT 'Без клана',
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                `;
+                await queryTurso(sql);
+                return true;
+            } catch (error) {
+                console.error('Ошибка создания таблицы:', error);
                 return false;
             }
         }
 
+        // ============================================================
+        //   ВХОД
+        // ============================================================
         async function loginUser() {
-            const username = login.value.trim();
-            const password = pass.value.trim();
+            const username = authLogin.value.trim();
+            const password = authPass.value.trim();
 
             if (!username || !password) {
-                error.textContent = 'Заполните все поля';
+                authError.textContent = '❌ Заполните все поля';
                 return;
             }
 
-            error.textContent = '';
+            authError.textContent = '';
             success.style.display = 'none';
+            statsBox.style.display = 'none';
 
-            authBtn.classList.add('loading');
-            regBtn.classList.add('loading');
+            authBtn.disabled = true;
+            authBtn.textContent = '⏳ Подключение...';
+            status.textContent = '🔄 Подключение...';
+            status.className = '';
 
             try {
-                const result = await apiCall('login', { username, password });
+                // Создаём таблицу если нет
+                await initDB();
 
-                if (result.error) {
-                    error.textContent = '❌ ' + result.error;
-                    return;
+                // Экранируем кавычки
+                const safeName = username.replace(/'/g, "''");
+
+                // Ищем пользователя
+                const result = await queryTurso(
+                    `SELECT id, username, rank, level, gold, kills, deaths, exp, class, clan FROM users WHERE username = '${safeName}'`
+                );
+
+                const rows = result?.results?.[0]?.response?.result?.rows || [];
+
+                if (rows.length === 0) {
+                    throw new Error('❌ Пользователь не найден');
                 }
 
-                currentUser = result.user;
+                const user = rows[0];
+                const dbPassword = safeString(user[1]);
+
+                if (dbPassword !== password) {
+                    throw new Error('❌ Неверный пароль!');
+                }
+
+                currentUser = {
+                    id: user[0],
+                    username: safeString(user[0]),
+                    rank: safeString(user[2]),
+                    level: safeInt(user[3]),
+                    gold: safeInt(user[4]),
+                    kills: safeInt(user[5]),
+                    deaths: safeInt(user[6]),
+                    exp: safeInt(user[7]),
+                    class: safeString(user[8]),
+                    clan: safeString(user[9])
+                };
+
                 success.style.display = 'block';
-                success.textContent = `✅ Привет, ${currentUser.username}!`;
-                status.textContent = `👋 ${currentUser.username} (Уровень ${currentUser.level})`;
-                error.textContent = '';
+                success.textContent = `✅ Добро пожаловать, ${username}!`;
+                status.textContent = `👋 ${username} (Уровень ${currentUser.level})`;
+                status.className = 'connected';
 
                 // Показываем статистику
                 showStats(currentUser);
 
-            } catch (e) {
-                error.textContent = '❌ Ошибка: ' + e.message;
-                console.error(e);
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                authError.textContent = error.message || '❌ Ошибка входа';
+                status.textContent = '❌ Ошибка входа';
+                status.className = 'error';
             } finally {
-                authBtn.classList.remove('loading');
-                regBtn.classList.remove('loading');
+                authBtn.disabled = false;
+                authBtn.textContent = 'Войти';
             }
         }
 
+        // ============================================================
+        //   РЕГИСТРАЦИЯ
+        // ============================================================
         async function registerUser() {
-            const username = login.value.trim();
-            const password = pass.value.trim();
+            const username = authLogin.value.trim();
+            const password = authPass.value.trim();
 
             if (!username || !password) {
-                error.textContent = 'Заполните все поля';
+                authError.textContent = '❌ Заполните все поля';
                 return;
             }
 
-            error.textContent = '';
+            authError.textContent = '';
             success.style.display = 'none';
+            statsBox.style.display = 'none';
 
-            authBtn.classList.add('loading');
-            regBtn.classList.add('loading');
+            authBtn.disabled = true;
+            authBtn.textContent = '⏳ Подключение...';
+            status.textContent = '🔄 Регистрация...';
+            status.className = '';
 
             try {
-                const result = await apiCall('register', { username, password });
+                // Создаём таблицу если нет
+                await initDB();
 
-                if (result.error) {
-                    error.textContent = '❌ ' + result.error;
-                    return;
+                // Экранируем кавычки
+                const safeName = username.replace(/'/g, "''");
+                const safePass = password.replace(/'/g, "''");
+
+                // Проверяем существование
+                const check = await queryTurso(
+                    `SELECT id FROM users WHERE username = '${safeName}'`
+                );
+
+                const rows = check?.results?.[0]?.response?.result?.rows || [];
+
+                if (rows.length > 0) {
+                    throw new Error('❌ Пользователь уже существует');
                 }
+
+                // Создаём пользователя
+                await queryTurso(
+                    `INSERT INTO users (username, password) VALUES ('${safeName}', '${safePass}')`
+                );
 
                 success.style.display = 'block';
                 success.textContent = '✅ Аккаунт создан! Теперь войдите.';
                 status.textContent = '✅ Регистрация успешна!';
+                status.className = 'connected';
 
-                login.value = '';
-                pass.value = '';
+                authLogin.value = '';
+                authPass.value = '';
 
-            } catch (e) {
-                error.textContent = '❌ Ошибка: ' + e.message;
-                console.error(e);
+                // Переключаем на вход
+                isLoginMode = true;
+                authBtn.textContent = 'Войти';
+                regBtn.textContent = 'Регистрация';
+                switchMode.textContent = 'Нет аккаунта? Зарегистрируйтесь';
+
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                authError.textContent = error.message || '❌ Ошибка регистрации';
+                status.textContent = '❌ Ошибка регистрации';
+                status.className = 'error';
             } finally {
-                authBtn.classList.remove('loading');
-                regBtn.classList.remove('loading');
+                authBtn.disabled = false;
+                authBtn.textContent = 'Регистрация';
             }
         }
 
+        // ============================================================
+        //   ПОКАЗ СТАТИСТИКИ
+        // ============================================================
         function showStats(user) {
             statsBox.style.display = 'block';
             statsBox.innerHTML = `
@@ -316,7 +472,7 @@
                 </div>
                 <div class="stat-row">
                     <span class="label">⭐ Ранг</span>
-                    <span class="value">${user.rank}</span>
+                    <span class="value">${getRankBadge(user.rank)}</span>
                 </div>
                 <div class="stat-row">
                     <span class="label">⚔️ Уровень</span>
@@ -335,6 +491,10 @@
                     <span class="value" style="color:#ffd866;">${user.gold}</span>
                 </div>
                 <div class="stat-row">
+                    <span class="label">✨ Опыт</span>
+                    <span class="value">${user.exp}</span>
+                </div>
+                <div class="stat-row">
                     <span class="label">🎯 Класс</span>
                     <span class="value">${user.class}</span>
                 </div>
@@ -346,10 +506,10 @@
         }
 
         // ============================================================
-        //   СОБЫТИЯ
+        //   ОБРАБОТЧИКИ СОБЫТИЙ
         // ============================================================
         authBtn.addEventListener('click', () => {
-            if (isLogin) {
+            if (isLoginMode) {
                 loginUser();
             } else {
                 registerUser();
@@ -357,21 +517,21 @@
         });
 
         regBtn.addEventListener('click', () => {
-            isLogin = !isLogin;
-            authBtn.textContent = isLogin ? 'Войти' : 'Создать';
-            regBtn.textContent = isLogin ? 'Регистрация' : 'Войти';
-            switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
-            error.textContent = '';
+            isLoginMode = !isLoginMode;
+            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
+            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
+            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
+            authError.textContent = '';
             success.style.display = 'none';
             statsBox.style.display = 'none';
         });
 
         switchMode.addEventListener('click', () => {
-            isLogin = !isLogin;
-            authBtn.textContent = isLogin ? 'Войти' : 'Создать';
-            regBtn.textContent = isLogin ? 'Регистрация' : 'Войти';
-            switchMode.textContent = isLogin ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
-            error.textContent = '';
+            isLoginMode = !isLoginMode;
+            authBtn.textContent = isLoginMode ? 'Войти' : 'Создать';
+            regBtn.textContent = isLoginMode ? 'Регистрация' : 'Войти';
+            switchMode.textContent = isLoginMode ? 'Нет аккаунта? Зарегистрируйтесь' : 'Уже есть аккаунт? Войдите';
+            authError.textContent = '';
             success.style.display = 'none';
             statsBox.style.display = 'none';
         });
@@ -383,9 +543,24 @@
         });
 
         // ============================================================
-        //   ЗАПУСК
+        //   ПРОВЕРКА ПОДКЛЮЧЕНИЯ
         // ============================================================
-        checkServer();
+        async function checkConnection() {
+            try {
+                status.textContent = '🔄 Проверка подключения...';
+                await queryTurso('SELECT 1');
+                status.textContent = '✅ Turso онлайн!';
+                status.className = 'connected';
+            } catch (error) {
+                console.error('Ошибка подключения:', error);
+                status.textContent = '⚠️ Turso недоступна';
+                status.className = 'error';
+                authError.textContent = '⚠️ Не удалось подключиться к базе данных';
+            }
+        }
+
+        // Запускаем проверку
+        checkConnection();
     </script>
 </body>
 </html>
